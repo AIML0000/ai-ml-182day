@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 02 — ML Lifecycle & Portfolio Workflow</title>
+<style>
+  :root{
+    --bg:#ffffff; --paper:#fafbfc; --line:#e4e8ee; --line-2:#eef1f5;
+    --ink:#111927; --body:#374151; --muted:#6b7280; --dim:#9aa4b2;
+    --teal:#0f766e; --teal-soft:#e6f4f2;   /* track identity */
+    --indigo:#4338ca;                        /* your strengths */
+    --amber:#b45309;                         /* answers / portfolio */
+    --violet:#7c3aed;                        /* terraform */
+    --rose:#be123c;                          /* warnings */
+    --code-bg:#f6f8fa;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--body);font-size:15px;line-height:1.6;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 90px}
+  code,pre,.mono{font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace}
+  p code,td code,li code,.a code,summary code{background:var(--code-bg);border:1px solid var(--line);
+    padding:1px 5px;border-radius:5px;font-size:.88em;color:#0b3b37}
+  a{color:var(--teal)}
+
+  /* Header */
+  header{border:1px solid var(--line);border-top:3px solid var(--teal);border-radius:var(--radius);
+    padding:22px 24px;background:var(--paper)}
+  .eyebrow{font-family:"SF Mono",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--teal);margin:0 0 10px}
+  .daybadge{display:inline-block;font-family:"SF Mono",monospace;font-weight:700;font-size:12px;
+    background:var(--teal);color:#fff;padding:3px 9px;border-radius:6px;margin-right:10px}
+  h1{margin:4px 0 8px;font-size:26px;line-height:1.2;letter-spacing:-.4px;color:var(--ink)}
+  .obj{color:var(--muted);margin:0;max-width:730px}
+  .hmeta{margin-top:14px;display:flex;gap:20px;flex-wrap:wrap;font-family:"SF Mono",monospace;
+    font-size:11.5px;color:var(--dim)}
+  .hmeta b{color:var(--body);font-weight:600}
+
+  /* Tabs */
+  nav.tabs{display:flex;gap:2px;margin:22px 0 0;border-bottom:2px solid var(--line);flex-wrap:wrap}
+  .tab{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;font-weight:600;
+    padding:11px 16px;border-bottom:2px solid transparent;font-family:inherit;position:relative;bottom:-2px}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+  .panel{display:none;padding-top:26px}
+  .panel.active{display:block}
+
+  h2{font-size:19px;margin:30px 0 12px;letter-spacing:-.2px;color:var(--ink)}
+  h2:first-child{margin-top:0}
+  h3{font-size:15px;margin:22px 0 8px;color:var(--ink)}
+  p{margin:10px 0}
+  .lead{color:var(--muted)}
+
+  /* Callouts — thin left bar, white bg (print-cheap) */
+  .call{border:1px solid var(--line);border-left:3px solid var(--teal);background:var(--bg);
+    padding:12px 16px;border-radius:8px;margin:16px 0}
+  .call.amber{border-left-color:var(--amber)} .call.warn{border-left-color:var(--rose)}
+  .call .k{font-family:"SF Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--teal);display:block;margin-bottom:4px}
+  .call.amber .k{color:var(--amber)} .call.warn .k{color:var(--rose)}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{color:var(--teal);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+    border-bottom:2px solid var(--line)}
+  td:first-child{color:var(--ink);font-weight:500}
+  tbody tr:hover{background:var(--paper)}
+
+  /* Code */
+  .code{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:14px 0;background:var(--code-bg)}
+  .codebar{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;
+    background:#eef1f5;border-bottom:1px solid var(--line)}
+  .codebar .fname{font-family:"SF Mono",monospace;font-size:11.5px;color:var(--muted)}
+  .copy{background:#fff;border:1px solid var(--line);color:var(--muted);cursor:pointer;font-size:10.5px;
+    padding:3px 9px;border-radius:6px;font-family:"SF Mono",monospace}
+  .copy:hover{color:var(--teal);border-color:var(--teal)}
+  pre{margin:0;padding:13px 16px;overflow-x:auto;font-size:13px;line-height:1.6}
+  pre code{color:#0f2e2a;white-space:pre}
+  .cmt{color:#8a94a2}
+
+  /* Lab */
+  .lab{border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:20px 0;background:var(--paper)}
+  .lab-h{display:flex;align-items:center;gap:10px;margin:0 0 6px;flex-wrap:wrap}
+  .lab-n{font-family:"SF Mono",monospace;font-size:11px;background:var(--teal-soft);color:var(--teal);
+    padding:3px 8px;border-radius:6px;font-weight:700}
+  .lab-h h3{margin:0}
+  .pill{font-family:"SF Mono",monospace;font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;margin-left:auto}
+  .pill.tf{color:var(--violet);border:1px solid #ddd0f5}
+  .pill.core{color:var(--amber);border:1px solid #f0dcc0}
+  .task{color:var(--body)}
+  .ans{margin-top:12px}
+  .ans-btn{background:#fff;border:1px dashed var(--teal);color:var(--teal);cursor:pointer;
+    font-size:12.5px;padding:8px 14px;border-radius:8px;font-family:inherit;font-weight:600}
+  .ans-btn:hover{background:var(--teal-soft)}
+  .ans-body{display:none;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+  .ans-body.open{display:block}
+  .ans-body h5{margin:14px 0 6px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
+  .ans-body h5:first-child{margin-top:0}
+
+  /* Q&A */
+  .qa{border:1px solid var(--line);border-radius:10px;margin:14px 0;overflow:hidden;background:var(--bg)}
+  .qa summary{cursor:pointer;padding:14px 16px;font-weight:600;list-style:none;display:flex;gap:10px;
+    align-items:flex-start;color:var(--ink)}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary::before{content:"Q";font-family:"SF Mono",monospace;color:var(--teal);font-weight:700;flex:none}
+  .qa[open] summary{border-bottom:1px solid var(--line);background:var(--paper)}
+  .qa .a{padding:14px 16px 16px 42px;color:var(--body);font-size:14px}
+  .qa .a strong{color:var(--ink)}
+  .qtag{font-family:"SF Mono",monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;
+    margin-left:auto;padding:2px 7px;border-radius:5px;color:var(--dim);border:1px solid var(--line);flex:none}
+
+  /* Progress */
+  .chk{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line-2)}
+  .chk input{appearance:none;-webkit-appearance:none;width:19px;height:19px;border:1.5px solid var(--dim);
+    border-radius:6px;background:#fff;cursor:pointer;flex:none;margin-top:2px;position:relative}
+  .chk input:checked{background:var(--teal);border-color:var(--teal)}
+  .chk input:checked::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;color:#fff;font-size:12px;font-weight:800}
+  .chk.done span{color:var(--dim);text-decoration:line-through}
+  .pbar{height:8px;background:#eef1f5;border:1px solid var(--line);border-radius:99px;overflow:hidden;margin:8px 0 20px}
+  .pbar i{display:block;height:100%;width:0;background:var(--teal);transition:width .3s}
+  .say{border:1px solid var(--line);border-left:3px solid var(--indigo);border-radius:8px;padding:16px;margin-top:20px}
+  .say li{margin:8px 0;color:var(--body)}
+  .nextbtn{display:inline-block;margin-top:18px;color:var(--teal);border:1px solid var(--teal);
+    padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13.5px}
+
+  /* Print */
+  @media print{
+    body{font-size:11.5pt;color:#000}
+    .wrap{padding:0;max-width:none}
+    nav.tabs,.copy,.ans-btn,.nextbtn{display:none!important}
+    .panel{display:block!important;padding-top:18px;page-break-before:always}
+    .panel:first-of-type{page-break-before:avoid}
+    .ans-body{display:block!important}
+    .qa .a{display:block!important}
+    header{border:1px solid #000}
+    .code,.lab,.qa,table,.call{page-break-inside:avoid}
+    a{color:#000;text-decoration:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">AI/ML Engineer · 182-Day Track · Phase 0</p>
+    <h1><span class="daybadge">DAY 02</span>ML Lifecycle &amp; Portfolio Workflow</h1>
+    <p class="obj">Map the ML lifecycle onto the SRE lifecycle you already run, then set up a professional portfolio: a structured repo pushed to GitHub, and Terraform state moved to a shared remote backend — the way real teams keep infra changes reviewable and auditable.</p>
+    <div class="hmeta">
+      <span><b>Est. time</b> 90 min</span>
+      <span><b>Stack</b> Git · GitHub · Terraform · Azure</span>
+      <span><b>Builds on</b> Day 01 foundation</span>
+      <span><b>Theme</b> print-friendly</span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="learn">Learn</button>
+    <button class="tab" data-tab="labs">Labs</button>
+    <button class="tab" data-tab="ref">Reference</button>
+    <button class="tab" data-tab="qa">Q&amp;A</button>
+    <button class="tab" data-tab="prog">Progress</button>
+  </nav>
+
+  <!-- LEARN -->
+  <section class="panel active" id="learn">
+    <h2>The ML lifecycle is the SRE lifecycle in a lab coat</h2>
+    <p class="lead">The JD's very first responsibility lists the whole ML lifecycle: <em>data ingestion → feature engineering → training → evaluation → deployment → monitoring → retraining → rollback</em>. Yesterday you saw the one-line mapping. Today, go one level deeper — because in the interview you'll be asked to <em>walk</em> this lifecycle, and your edge is being able to say "that stage is X in the systems I already operate."</p>
+
+    <table>
+      <thead><tr><th>ML stage</th><th>What actually happens</th><th>Azure service (later)</th><th>Your SRE analog</th></tr></thead>
+      <tbody>
+        <tr><td>Data ingestion &amp; features</td><td>Pull raw data, clean, engineer features, land them somewhere reusable</td><td>Databricks, Data Factory</td><td>Log/metric pipelines, ETL, Ansible flows</td></tr>
+        <tr><td>Training &amp; tracking</td><td>Fit models, record params/metrics/artifacts per run</td><td>Azure ML + MLflow</td><td>Build jobs producing versioned artifacts</td></tr>
+        <tr><td>Evaluation</td><td>Score candidates, compare, decide go/no-go</td><td>MLflow metrics, tests</td><td>Quality gates in a pipeline</td></tr>
+        <tr><td>Registry &amp; promotion</td><td>Version the chosen model, promote Dev→Test→Prod</td><td>Azure ML / MLflow registry</td><td>Artifact registry + release approvals</td></tr>
+        <tr><td>Deployment</td><td>Serve the model behind an endpoint on a cluster</td><td>Azure ML endpoints, AKS + Helm</td><td>Release engineering, K8s rollout</td></tr>
+        <tr><td>Monitoring</td><td>Watch drift, quality, latency, health</td><td>Azure ML monitor, App Insights</td><td>Golden signals, dashboards, alerts</td></tr>
+        <tr><td>Retraining</td><td>Trigger a fresh model on drift/schedule/new data</td><td>Azure ML pipelines + triggers</td><td>Automated CD / scheduled remediation</td></tr>
+        <tr><td>Rollback</td><td>Shift traffic back to a known-good model version</td><td>Endpoint traffic split</td><td>Rollback — identical concept</td></tr>
+      </tbody>
+    </table>
+
+    <div class="call">
+      <span class="k">The takeaway</span>
+      Six of these eight stages are things you already do; only <b>training/tracking</b> and <b>evaluation</b> are genuinely new craft. That's the whole reason a senior title is realistic — you're adding modeling skill on top of an operations spine most ML-only candidates lack.
+    </div>
+
+    <h2>Why a real repo, and real remote state</h2>
+    <p>Two habits separate a "did a course" candidate from a "ships to production" one, and you'll bake both in today:</p>
+    <p><strong>1 · A structured repo.</strong> Exploration (notebooks) is kept separate from reusable code (<code>src/</code>) and from infrastructure (<code>infra/</code>). Each of your ten portfolio projects gets its own folder. This is what a reviewer opens, and it signals engineering maturity instantly.</p>
+    <p><strong>2 · Remote Terraform state.</strong> Day 1 kept state in a local file — fine for one person, one machine. Real teams put state in a shared, locked, encrypted backend so changes are collaborative, durable, and never sitting in Git. Moving it there is exactly the "controlled configuration management" the JD asks for, and it's a satisfying, concrete lab.</p>
+
+    <div class="call amber">
+      <span class="k">Today's mission</span>
+      1 · Scaffold and push the portfolio repo &nbsp; 2 · Stand up a remote state backend on Azure &nbsp; 3 · Migrate Terraform state into it &nbsp; 4 · Complete the lifecycle-mapping worksheet. Every lab has a worked answer.
+    </div>
+  </section>
+
+  <!-- LABS -->
+  <section class="panel" id="labs">
+    <p class="lead">Assumes you finished Day 1 (repo bootstrapped, Terraform installed, <code>az login</code> working).</p>
+
+    <!-- Lab 1 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 1</span><h3>Scaffold and push the portfolio repo</h3><span class="pill core">Core</span></div>
+      <p class="task">Give the repo a structure a reviewer can navigate, then push it to GitHub as a private repo. Work on a branch, not <code>main</code> — you're rehearsing the review-gated workflow the JD wants.</p>
+      <div class="code"><div class="codebar"><span class="fname">scaffold.sh</span><button class="copy">copy</button></div>
+      <pre><code>cd ai-ml-182day
+git checkout -b day-02-setup
+
+mkdir -p infra notebooks src projects docs
+mkdir -p projects/01-eda-report projects/02-classifier
+
+cat > README.md &lt;&lt;'MD'
+# AI/ML Engineer — 182-Day Portfolio
+Learning + projects for a Senior AI/ML Engineer (Azure) transition.
+
+## Layout
+- infra/      Terraform (IaC) for the Azure foundation
+- notebooks/  exploration
+- src/        reusable Python modules
+- projects/   the ten portfolio projects
+- docs/       gap-map, notes, diagrams
+MD
+
+git add .
+git commit -m "chore: scaffold repo structure + README"</code></pre></div>
+      <div class="code"><div class="codebar"><span class="fname">push to GitHub</span><button class="copy">copy</button></div>
+      <pre><code><span class="cmt"># with GitHub CLI (easiest):</span>
+gh repo create AIML0000/ai-ml-182day --private --source=. --push
+
+<span class="cmt"># OR manual: create empty repo on github.com, then:</span>
+git remote add origin git@github.com:AIML0000/ai-ml-182day.git
+git push -u origin day-02-setup</code></pre></div>
+      <div class="ans">
+        <button class="ans-btn">Show answer ▸</button>
+        <div class="ans-body">
+          <h5>Why a branch and not main</h5>
+          <p>Committing straight to <code>main</code> works, but pushing a branch and opening a pull request — even for yourself — rehearses the exact "reviewable changes" discipline the JD names. On real teams, <code>main</code> is protected and every change lands via PR with a green CI check.</p>
+          <h5>Verify</h5>
+          <div class="code"><div class="codebar"><span class="fname">shell</span><button class="copy">copy</button></div>
+          <pre><code>git branch          <span class="cmt"># * day-02-setup</span>
+git remote -v       <span class="cmt"># origin points at your repo</span>
+tree -L 2 -d        <span class="cmt"># the folder skeleton (or: ls -R)</span></code></pre></div>
+          <h5>Note</h5>
+          <p>Confirm <code>.venv/</code>, <code>*.tfstate*</code>, and <code>terraform.tfvars</code> are still ignored (from Day 1). The scaffold must never carry state or secrets to GitHub.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab 2 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 2</span><h3>Stand up a remote state backend</h3><span class="pill tf">Terraform</span></div>
+      <p class="task">Terraform needs somewhere to store state <em>before</em> Terraform manages it — a classic bootstrap. Create a dedicated Storage Account + blob container with the Azure CLI (kept separate from your app infra), so it survives even a full <code>destroy</code>.</p>
+      <div class="code"><div class="codebar"><span class="fname">backend-bootstrap.sh</span><button class="copy">copy</button></div>
+      <pre><code>RG=tfstate-rg
+LOC=centralindia
+SA=tfstate$RANDOM$RANDOM          <span class="cmt"># must be globally unique, lowercase</span>
+
+az group create -n $RG -l $LOC
+az storage account create -n $SA -g $RG -l $LOC \
+  --sku Standard_LRS --encryption-services blob --min-tls-version TLS1_2
+az storage container create -n tfstate --account-name $SA
+
+echo "Storage account: $SA"      <span class="cmt"># note this name for the backend block</span></code></pre></div>
+      <div class="ans">
+        <button class="ans-btn">Show answer ▸</button>
+        <div class="ans-body">
+          <h5>Why the CLI, not Terraform, for this</h5>
+          <p>Chicken-and-egg: you can't store the backend's own state <em>in</em> the backend before it exists. Bootstrapping the state container out-of-band (CLI) is the standard, pragmatic pattern. Some teams manage it with a tiny separate Terraform config using local state — either is defensible; the CLI is simpler and you'll rarely touch it again.</p>
+          <h5>Why a separate resource group</h5>
+          <p><code>tfstate-rg</code> is deliberately <em>not</em> <code>mllab-rg</code>. Your app foundation gets created and destroyed constantly during learning; the state store must outlive those cycles. Never let Terraform manage the thing that holds its own state.</p>
+          <h5>Verify</h5>
+          <div class="code"><div class="codebar"><span class="fname">shell</span><button class="copy">copy</button></div>
+          <pre><code>az storage account show -n $SA -g $RG --query name -o tsv
+az storage container list --account-name $SA -o table   <span class="cmt"># tfstate listed</span></code></pre></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab 3 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 3</span><h3>Migrate Terraform state to the backend</h3><span class="pill tf">Terraform</span></div>
+      <p class="task">Point your Day-1 <code>infra/</code> config at the remote backend and migrate the existing local state into it. Add the backend block, then re-init.</p>
+      <div class="code"><div class="codebar"><span class="fname">infra/backend.tf</span><button class="copy">copy</button></div>
+      <pre><code>terraform {
+  backend "azurerm" {
+    resource_group_name  = "tfstate-rg"
+    storage_account_name = "tfstateXXXXXXXX"   <span class="cmt"># the $SA from Lab 2</span>
+    container_name       = "tfstate"
+    key                  = "foundation/terraform.tfstate"
+  }
+}</code></pre></div>
+      <div class="code"><div class="codebar"><span class="fname">migrate</span><button class="copy">copy</button></div>
+      <pre><code>cd infra
+terraform init -migrate-state     <span class="cmt"># prompts to copy local state to Azure -> yes</span>
+terraform plan                    <span class="cmt"># should show: No changes.</span></code></pre></div>
+      <div class="ans">
+        <button class="ans-btn">Show answer ▸</button>
+        <div class="ans-body">
+          <h5>Expected</h5>
+          <div class="code"><div class="codebar"><span class="fname">output</span><button class="copy">copy</button></div>
+          <pre><code>Initializing the backend...
+Do you want to copy existing state to the new backend?
+  Enter a value: yes
+
+Successfully configured the backend "azurerm"!
+...
+No changes. Your infrastructure matches the configuration.</code></pre></div>
+          <p>"No changes" after migration is the whole point: same resources, state just lives in Azure now. Your local <code>terraform.tfstate</code> becomes a stale backup — it's already git-ignored.</p>
+          <h5>The <code>key</code> is a namespace</h5>
+          <p><code>key = "foundation/terraform.tfstate"</code> is the blob path inside the container. Give each project its own key (<code>projects/02-classifier/terraform.tfstate</code>) so many stacks share one backend without colliding.</p>
+          <h5>State locking — a free interview point</h5>
+          <p>The azurerm backend locks state using a <strong>blob lease</strong> automatically. If a second <code>apply</code> runs concurrently, it's blocked until the first releases the lease — no separate lock table needed (unlike AWS's DynamoDB). That's how remote state prevents two people corrupting infra at once.</p>
+          <h5>If it fails on auth</h5>
+          <p>The backend reaches the storage account using your <code>az login</code> session. If you get a 403, you either lack rights to list the account keys, or you're using AAD auth without the <code>Storage Blob Data Contributor</code> role. Fix: confirm the right subscription is active, or assign that role to yourself on the storage account.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab 4 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 4</span><h3>Lifecycle-mapping worksheet</h3><span class="pill core">Analysis</span></div>
+      <p class="task">Scenario: your team ships a <em>fraud-detection</em> model that scores transactions in real time. For each ML stage, name (a) what happens for this specific model and (b) which SRE muscle you'd reuse. Do it before revealing.</p>
+      <table>
+        <thead><tr><th>Stage</th><th>For the fraud model / your SRE reuse</th></tr></thead>
+        <tbody>
+          <tr><td>Data ingestion &amp; features</td><td>______</td></tr>
+          <tr><td>Deployment</td><td>______</td></tr>
+          <tr><td>Monitoring</td><td>______</td></tr>
+          <tr><td>Retraining</td><td>______</td></tr>
+          <tr><td>Rollback</td><td>______</td></tr>
+        </tbody>
+      </table>
+      <div class="ans">
+        <button class="ans-btn">Show model answer ▸</button>
+        <div class="ans-body">
+          <table>
+            <thead><tr><th>Stage</th><th>Model specifics → SRE reuse</th></tr></thead>
+            <tbody>
+              <tr><td>Ingestion &amp; features</td><td>Stream transactions, engineer features like velocity (txns/min), amount vs. user baseline → <strong>reuse:</strong> the streaming/log-pipeline and aggregation patterns you already run.</td></tr>
+              <tr><td>Deployment</td><td>Serve the scorer behind a low-latency endpoint on AKS, packaged with Helm → <strong>reuse:</strong> K8s rollout, Helm charts, canary release.</td></tr>
+              <tr><td>Monitoring</td><td>Track p95 scoring latency, throughput, error rate, plus fraud-rate drift and precision/recall on confirmed cases → <strong>reuse:</strong> golden-signal dashboards and alerting.</td></tr>
+              <tr><td>Retraining</td><td>Trigger a retrain when drift crosses a threshold or weekly, gated by an eval metric before promotion → <strong>reuse:</strong> scheduled/automated CD with quality gates.</td></tr>
+              <tr><td>Rollback</td><td>Shift endpoint traffic back to the previous model version if the new one degrades precision → <strong>reuse:</strong> versioned rollback, identical to app rollback.</td></tr>
+            </tbody>
+          </table>
+          <div class="call"><span class="k">Keep this</span> Save it to <code>docs/lifecycle-fraud-example.md</code>. Concrete lifecycle walkthroughs are gold in interviews — vague ones aren't.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="call warn">
+      <span class="k">Wrap-up</span>
+      Commit the new <code>infra/backend.tf</code> (safe — it holds names, not secrets) and open a PR from <code>day-02-setup</code> to <code>main</code>. Leave the backend storage running; it's near-free and holds your state. You can still <code>terraform destroy</code> the app foundation any time — its state stays safe in Azure.
+    </div>
+  </section>
+
+  <!-- REFERENCE -->
+  <section class="panel" id="ref">
+    <h2>Recommended repo structure</h2>
+    <div class="code"><div class="codebar"><span class="fname">ai-ml-182day/</span><button class="copy">copy</button></div>
+    <pre><code>ai-ml-182day/
+├── README.md
+├── requirements.txt
+├── .gitignore
+├── infra/                 <span class="cmt"># Terraform (IaC)</span>
+│   ├── versions.tf
+│   ├── variables.tf
+│   ├── main.tf
+│   ├── outputs.tf
+│   └── backend.tf
+├── notebooks/             <span class="cmt"># exploration, EDA</span>
+├── src/                   <span class="cmt"># reusable python modules</span>
+├── projects/
+│   ├── 01-eda-report/
+│   ├── 02-classifier/
+│   └── ...                <span class="cmt"># ten portfolio projects</span>
+└── docs/                  <span class="cmt"># jd-gap-map.md, lifecycle notes, diagrams</span></code></pre></div>
+
+    <h2>Git workflow (review-gated)</h2>
+    <table>
+      <thead><tr><th>Command</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>git checkout -b &lt;name&gt;</code></td><td>Start a branch per day/project</td></tr>
+        <tr><td><code>git add -p</code></td><td>Stage hunks selectively (review your own diff)</td></tr>
+        <tr><td><code>git commit -m "type: msg"</code></td><td>Conventional message (chore/feat/fix/docs)</td></tr>
+        <tr><td><code>git push -u origin &lt;name&gt;</code></td><td>Push the branch</td></tr>
+        <tr><td><code>gh pr create</code></td><td>Open a PR (rehearse review)</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Terraform remote backend (azurerm)</h2>
+    <table>
+      <thead><tr><th>Item</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Bootstrap</td><td>Create the state Storage Account + container with the CLI, out-of-band.</td></tr>
+        <tr><td><code>key</code></td><td>Blob path inside the container; one per stack to avoid collisions.</td></tr>
+        <tr><td>Locking</td><td>Automatic via blob lease — no separate lock table.</td></tr>
+        <tr><td><code>init -migrate-state</code></td><td>Copies local state into the backend.</td></tr>
+        <tr><td><code>init -reconfigure</code></td><td>Switch backend without migrating (fresh state).</td></tr>
+        <tr><td>Auth</td><td>Uses your <code>az login</code>; AAD auth needs <code>Storage Blob Data Contributor</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Local vs remote state</h2>
+    <table>
+      <thead><tr><th></th><th>Local</th><th>Remote (azurerm)</th></tr></thead>
+      <tbody>
+        <tr><td>Collaboration</td><td>One machine</td><td>Shared, team-wide</td></tr>
+        <tr><td>Locking</td><td>None</td><td>Blob lease</td></tr>
+        <tr><td>Durability</td><td>Your disk</td><td>Replicated storage</td></tr>
+        <tr><td>Secret exposure</td><td>File on disk / risk of Git</td><td>Access-controlled, encrypted</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Q&A -->
+  <section class="panel" id="qa">
+    <p class="lead">Interview and scenario questions for today's material. Answer before expanding.</p>
+
+    <details class="qa"><summary>Walk me through the end-to-end ML lifecycle.<span class="qtag">interview</span></summary>
+      <div class="a">Data is <strong>ingested</strong> and turned into <strong>features</strong>; models are <strong>trained</strong> with every run's params and metrics <strong>tracked</strong>; candidates are <strong>evaluated</strong> and the winner is <strong>registered and version-controlled</strong>; it's promoted through Dev→Test→Prod and <strong>deployed</strong> behind an endpoint on a cluster; in production it's <strong>monitored</strong> for latency, health, data drift, and prediction quality; when drift or new data warrants it, a <strong>retraining</strong> pipeline runs, gated by evaluation before promotion; and if a new version underperforms, you <strong>roll back</strong> to the last good one. The operational half — deploy, monitor, retrain, rollback — is standard release engineering; the modeling half — train, evaluate — is the ML-specific craft.</div>
+    </details>
+
+    <details class="qa"><summary>Why move Terraform state to a remote backend instead of keeping it local?<span class="qtag">system design</span></summary>
+      <div class="a">Four reasons. <strong>Collaboration:</strong> a shared backend is the single source of truth, so teammates aren't each holding a divergent state file. <strong>Locking:</strong> the azurerm backend takes a blob lease so two applies can't corrupt state concurrently. <strong>Durability:</strong> replicated cloud storage beats one laptop's disk. <strong>Security:</strong> state can contain secrets in plaintext, so it belongs in access-controlled, encrypted storage — never in Git. It's the "controlled configuration management" the JD asks for, made real.</div>
+    </details>
+
+    <details class="qa"><summary>How would you structure an ML project repository, and why?<span class="qtag">practical</span></summary>
+      <div class="a">Separate concerns by folder: <code>infra/</code> for Terraform, <code>notebooks/</code> for throwaway exploration, <code>src/</code> for code that's been promoted to reusable, tested modules, <code>projects/</code> for each deliverable, and <code>docs/</code> for design notes and diagrams. The key discipline is that notebooks are for <em>discovery</em> and don't ship — once logic is worth keeping, it moves to <code>src/</code> where it can be imported, tested, and packaged. A reviewer can then tell at a glance what's exploratory and what's production-bound, which signals maturity.</div>
+    </details>
+
+    <details class="qa"><summary>How does model "retraining" relate to the CI/CD you already run?<span class="qtag">translation</span></summary>
+      <div class="a">Retraining <em>is</em> a CD pipeline with an ML-specific trigger and gate. Instead of a code commit kicking off build→test→deploy, the trigger is a <strong>schedule</strong>, a <strong>drift alarm</strong>, or <strong>new labeled data</strong>; instead of unit tests as the gate, an <strong>evaluation metric</strong> (e.g. accuracy ≥ current prod) must pass before the new model is promoted. The plumbing — automated, gated, auditable, with rollback — is identical to what I run today; only the artifact (a model) and the gate (a metric) differ.</div>
+    </details>
+
+    <details class="qa"><summary>What does state locking protect against, and how does the azurerm backend do it?<span class="qtag">concept</span></summary>
+      <div class="a">It protects against two concurrent operations mutating the same state and corrupting it — e.g. two engineers running <code>apply</code> at once, ending with a state file that matches neither reality. The <strong>azurerm</strong> backend acquires a <strong>lease on the state blob</strong> at the start of a write operation; a second operation can't acquire the lease and waits or fails fast, so writes serialize. It's automatic — no separate lock table like AWS's DynamoDB. If a process dies mid-apply and leaves a stale lease, you can force-unlock, carefully.</div>
+    </details>
+
+    <details class="qa"><summary>Error-fix: <code>terraform init -migrate-state</code> fails with a 403 reaching the backend storage. Diagnose it.<span class="qtag">error-fix</span></summary>
+      <div class="a">The backend can't authenticate to the storage account. Check, in order: <strong>1)</strong> Is the right subscription active? <code>az account show</code> — the storage account must live there. <strong>2)</strong> Do the <code>storage_account_name</code> / <code>container_name</code> in the backend block exactly match what Lab 2 created (typo in the random name is common)? <strong>3)</strong> Auth mode — by default the backend fetches the account key via your session, which needs rights to <em>list keys</em>; if the account enforces AAD auth, you instead need the <code>Storage Blob Data Contributor</code> role assigned to your identity on that account. <strong>4)</strong> A storage firewall/network rule can block your IP — check the account's networking settings. Assign the role or fix the name/subscription, then re-run.</div>
+    </details>
+  </section>
+
+  <!-- PROGRESS -->
+  <section class="panel" id="prog">
+    <h2>Day 2 checklist</h2>
+    <div class="pbar"><i id="pfill"></i></div>
+    <div id="checks">
+      <label class="chk"><input type="checkbox" data-c="1"><span>Scaffolded repo structure + README on a branch</span></label>
+      <label class="chk"><input type="checkbox" data-c="2"><span>Pushed the repo to GitHub (private)</span></label>
+      <label class="chk"><input type="checkbox" data-c="3"><span>Bootstrapped a remote state Storage Account + container</span></label>
+      <label class="chk"><input type="checkbox" data-c="4"><span>Migrated Terraform state to the azurerm backend (plan shows "No changes")</span></label>
+      <label class="chk"><input type="checkbox" data-c="5"><span>Completed the fraud-model lifecycle worksheet, saved to docs/</span></label>
+      <label class="chk"><input type="checkbox" data-c="6"><span>Opened a PR from day-02-setup to main</span></label>
+      <label class="chk"><input type="checkbox" data-c="7"><span>Read all six Q&amp;A answers</span></label>
+    </div>
+
+    <div class="say">
+      <strong>What you can now say in an interview:</strong>
+      <ul>
+        <li>"I keep Terraform state in a shared azurerm backend with blob-lease locking, so infra changes are collaborative, durable, and auditable."</li>
+        <li>"I can walk the full ML lifecycle and tell you exactly which stages map to release engineering I already own versus modeling I've built."</li>
+        <li>"My repos separate exploration from production code and infrastructure — reviewers can read the maturity at a glance."</li>
+      </ul>
+    </div>
+
+    <a class="nextbtn" href="#" onclick="return false;">Next → Day 03: Python refresh — data structures, comprehensions, and SRE-flavored idioms</a>
+  </section>
+
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    panels.forEach(p => p.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.tab).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }));
+
+  document.querySelectorAll('.ans-btn').forEach(b => b.addEventListener('click', () => {
+    const body = b.nextElementSibling;
+    const open = body.classList.toggle('open');
+    if(open){ b.textContent = 'Hide answer ▾'; }
+    else { b.textContent = b.dataset.model ? 'Show model answer ▸' : 'Show answer ▸'; }
+  }));
+  // remember which buttons are "model answer"
+  document.querySelectorAll('.ans-btn').forEach(b => {
+    if(b.textContent.includes('model')) b.dataset.model = '1';
+  });
+
+  function fallbackCopy(text, ok, no){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed'; ta.style.top = '-9999px';
+    document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, text.length);
+    let done = false;
+    try { done = document.execCommand('copy'); } catch(e){ done = false; }
+    document.body.removeChild(ta);
+    done ? ok() : no();
+  }
+  document.querySelectorAll('.copy').forEach(btn => btn.addEventListener('click', () => {
+    const code = btn.closest('.code').querySelector('code');
+    const text = code.innerText;
+    const ok = () => { btn.textContent = 'copied ✓'; setTimeout(() => btn.textContent = 'copy', 1200); };
+    const no = () => { btn.textContent = 'Ctrl/⌘+C'; setTimeout(() => btn.textContent = 'copy', 1600); };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok, no));
+    } else {
+      fallbackCopy(text, ok, no);
+    }
+  }));
+
+  const KEY = 'day02_lifecycle_progress';
+  let state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ state = {}; }
+  const boxes = document.querySelectorAll('#checks input');
+  function refresh(){
+    const done = Object.values(state).filter(Boolean).length;
+    document.getElementById('pfill').style.width = (done/boxes.length*100) + '%';
+  }
+  boxes.forEach(cb => {
+    const id = cb.dataset.c;
+    cb.checked = !!state[id];
+    cb.closest('.chk').classList.toggle('done', cb.checked);
+    cb.addEventListener('change', () => {
+      state[id] = cb.checked;
+      localStorage.setItem(KEY, JSON.stringify(state));
+      cb.closest('.chk').classList.toggle('done', cb.checked);
+      refresh();
+    });
+  });
+  refresh();
+</script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Senior AI/ML Engineer — 182-Day Roadmap</title>
+<style>
+  :root{
+    --bg:#ffffff; --paper:#fafbfc; --line:#e4e8ee; --line-2:#eef1f5;
+    --ink:#111927; --body:#374151; --muted:#6b7280; --dim:#9aa4b2;
+    --teal:#0f766e; --teal-soft:#e6f4f2;
+    --indigo:#4338ca; --amber:#b45309; --violet:#7c3aed; --rose:#be123c;
+    --code-bg:#f6f8fa; --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--body);font-size:15px;line-height:1.55;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1060px;margin:0 auto;padding:30px 20px 80px}
+  .mono{font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace}
+
+  header{border:1px solid var(--line);border-top:3px solid var(--teal);border-radius:var(--radius);
+    padding:24px 26px;background:var(--paper)}
+  .eyebrow{font-family:"SF Mono",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--teal);margin:0 0 10px}
+  h1{margin:2px 0 8px;font-size:29px;line-height:1.15;letter-spacing:-.5px;color:var(--ink)}
+  h1 span{color:var(--muted);font-weight:400}
+  .sub{color:var(--muted);max-width:780px;margin:0}
+
+  .prog-shell{margin-top:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .bar{flex:1;min-width:220px;height:10px;background:#eef1f5;border:1px solid var(--line);
+    border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;border-radius:99px;background:var(--teal);transition:width .35s ease}
+  .prog-num{font-family:"SF Mono",monospace;font-size:13px;color:var(--muted);white-space:nowrap}
+  .prog-num b{color:var(--ink)}
+  .reset{background:#fff;border:1px solid var(--line);color:var(--dim);cursor:pointer;
+    font-size:11px;padding:6px 10px;border-radius:8px;font-family:inherit}
+  .reset:hover{color:var(--rose);border-color:#f0c9d2}
+
+  .gap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0 8px}
+  @media(max-width:720px){.gap{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px 12px}
+  .card h3{margin:0 0 10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+  .card.have h3{color:var(--indigo)} .card.build h3{color:var(--teal)}
+  .card ul{margin:0;padding:0;list-style:none}
+  .card li{padding:6px 0 6px 22px;position:relative;color:var(--body);font-size:13.5px;border-top:1px solid var(--line-2)}
+  .card li:first-child{border-top:none}
+  .card.have li::before{content:"✓";position:absolute;left:0;color:var(--indigo);font-weight:700}
+  .card.build li::before{content:"→";position:absolute;left:0;color:var(--teal);font-weight:700}
+
+  .legend{display:flex;gap:20px;flex-wrap:wrap;margin:20px 2px 4px;font-size:12px;color:var(--dim)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:9px;height:9px;border-radius:99px;display:inline-block}
+
+  .phase{margin-top:14px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--bg)}
+  .phase-head{display:flex;align-items:center;gap:14px;padding:15px 18px;cursor:pointer;user-select:none}
+  .phase.open .phase-head{border-bottom:1px solid var(--line)}
+  .phase-idx{font-family:"SF Mono",monospace;font-size:12px;color:#fff;background:var(--teal);
+    padding:3px 8px;border-radius:6px;font-weight:700;white-space:nowrap}
+  .phase-title{font-weight:600;font-size:16px;flex:1;min-width:0;color:var(--ink)}
+  .phase-title small{display:block;color:var(--muted);font-weight:400;font-size:12.5px;margin-top:2px}
+  .phase-meta{font-family:"SF Mono",monospace;font-size:12px;color:var(--muted);white-space:nowrap}
+  .chev{color:var(--dim);transition:transform .25s;font-size:12px}
+  .phase.open .chev{transform:rotate(90deg)}
+  .phase-body{display:none;padding:4px 0}
+  .phase.open .phase-body{display:block}
+
+  .day{display:flex;align-items:flex-start;gap:13px;padding:10px 18px;border-top:1px solid var(--line-2)}
+  .day:hover{background:var(--paper)}
+  .day input{appearance:none;-webkit-appearance:none;margin:2px 0 0;flex:none;
+    width:18px;height:18px;border:1.5px solid var(--dim);border-radius:6px;background:#fff;cursor:pointer;position:relative}
+  .day input:checked{background:var(--teal);border-color:var(--teal)}
+  .day input:checked::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:11px;font-weight:800}
+  .dnum{font-family:"SF Mono",monospace;font-size:12px;color:var(--dim);min-width:46px;padding-top:1px}
+  .dtxt{flex:1;font-size:14px;color:var(--body)}
+  .day.done .dtxt{color:var(--dim);text-decoration:line-through;text-decoration-color:var(--line)}
+  .tag{font-family:"SF Mono",monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;margin-left:8px;white-space:nowrap}
+  .tag.port{color:var(--amber);border:1px solid #f0dcc0}
+  .tag.str{color:var(--indigo);border:1px solid #d2d4f2}
+
+  footer{margin-top:34px;color:var(--muted);font-size:13px;line-height:1.7;
+    border-top:1px solid var(--line);padding-top:18px}
+  footer b{color:var(--ink)}
+
+  @media print{
+    .reset,.chev{display:none}
+    .phase-body{display:block!important}
+    .phase{break-inside:avoid;border:1px solid #ccc}
+    body{color:#000}
+    a{color:#000}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Target Role · Azure · MLOps · GenAI · Agentic AI</p>
+    <h1>Senior AI/ML Engineer <span>— 182-day path to interview-ready</span></h1>
+    <p class="sub">You already own the production/MLOps half of this JD from your SRE lead work — Kubernetes, Docker, Helm, AKS, CI/CD, monitoring, RBAC/Key Vault. Across ~26 weeks this plan builds the other half — Python, math, data engineering, core ML, deep learning, the Azure ML + Databricks stack, Generative AI, and Agentic AI — with 10 portfolio projects and built-in review days. ~1.5–2 hrs/day.</p>
+    <div class="prog-shell">
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="prog-num"><b id="doneCount">0</b> / 182 days · <b id="pct">0%</b></div>
+      <button class="reset" id="resetBtn">Reset progress</button>
+    </div>
+  </header>
+
+  <div class="gap">
+    <div class="card have">
+      <h3>Already yours (leverage &amp; reframe)</h3>
+      <ul>
+        <li>Kubernetes / AKS, Docker, Helm — the "deploy on K8s" requirement</li>
+        <li>CI/CD &amp; automation (Jenkins, GitOps) — ML pipeline delivery</li>
+        <li>Monitoring &amp; observability — reframes as drift / model / latency monitoring</li>
+        <li>Security, RBAC, secrets/Key Vault, auditability</li>
+        <li>Running systems in production at scale — your core SRE identity</li>
+      </ul>
+    </div>
+    <div class="card build">
+      <h3>The real build (this plan)</h3>
+      <ul>
+        <li>Python, math &amp; stats, and data-engineering foundations</li>
+        <li>Core ML: classification, regression, anomaly detection, time-series</li>
+        <li>Deep learning: PyTorch / TensorFlow, transformers, SHAP</li>
+        <li>Azure ML + MLflow + Databricks (batch &amp; streaming)</li>
+        <li>GenAI: Azure OpenAI, embeddings, vector search, RAG, fine-tuning</li>
+        <li>Agentic AI: LangGraph, tool calling, guardrails, MCP</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><i class="dot" style="background:var(--amber)"></i> Portfolio milestone — a project you ship</span>
+    <span><i class="dot" style="background:var(--indigo)"></i> Plays to your existing SRE strength</span>
+  </div>
+
+  <div id="phases"></div>
+
+  <footer>
+    <b>Honest read:</b> no plan hands you the JD's "4+ years hands-on ML" line — but 26 weeks of daily work closes the skills gap, ships 10 demonstrable projects, and lets you legitimately reframe years of SRE / AIOps / observability work as ML-production experience.<br>
+    Progress saves automatically in this browser. Tap a phase header to expand · print to PDF anytime.
+  </footer>
+</div>
+
+<script>
+const PLAN = [
+  { idx:"P0", title:"Alignment & Foundation", note:"Map the JD to your skills; stand up the environment as code", days:[
+    [1,"Gap-map the JD line-by-line to your skills; provision the Azure foundation with Terraform",null,true],
+    [2,"ML lifecycle ↔ your SRE lifecycle; portfolio repo + remote Terraform state",null,true],
+  ]},
+  { idx:"P1", title:"Python for ML", note:"From data structures to NumPy — the language of everything ahead", days:[
+    [3,"Data structures — list, dict, set, tuple"],
+    [4,"Comprehensions & Pythonic idioms"],
+    [5,"Functions — args, *args/**kwargs, scope, closures"],
+    [6,"Modules, packages, imports, venv/poetry"],
+    [7,"OOP 1 — classes, instances, methods"],
+    [8,"OOP 2 — dunder methods, dataclasses, properties"],
+    [9,"Error handling & logging (SRE-flavored)"],
+    [10,"File & data formats — CSV, JSON, YAML, pathlib"],
+    [11,"Type hints & mypy"],
+    [12,"Testing with pytest — fixtures, parametrize"],
+    [13,"Iterators & generators"],
+    [14,"Decorators & context managers"],
+    [15,"Functional tools — itertools, functools"],
+    [16,"Async Python — asyncio (for API/LLM concurrency)"],
+    [17,"Calling APIs — requests/httpx, retries, rate limits",null,true],
+    [18,"CLI tools — argparse/click; package a script"],
+    [19,"NumPy 1 — arrays, vectorization, broadcasting"],
+    [20,"NumPy 2 — aggregation, reshaping, linear-algebra ops"],
+    [21,"Review + refactor drills"],
+    [22,"Project: Python CLI data tool with tests","port"],
+  ]},
+  { idx:"P2", title:"Math & Stats for ML", note:"The minimum viable math to reason about models, not fear them", days:[
+    [23,"Linear algebra 1 — vectors, dot product, norms"],
+    [24,"Linear algebra 2 — matrices, multiplication, rank"],
+    [25,"Linear algebra 3 — eigenvalues, SVD intuition"],
+    [26,"Calculus 1 — derivatives, gradients"],
+    [27,"Calculus 2 — chain rule, partial derivatives (backprop prep)"],
+    [28,"Probability 1 — distributions, expectation, variance"],
+    [29,"Probability 2 — conditional probability, Bayes"],
+    [30,"Statistics 1 — sampling, CLT, standard error"],
+    [31,"Statistics 2 — hypothesis testing, p-values, CIs"],
+    [32,"Statistics 3 — correlation vs causation, A/B testing"],
+    [33,"Information theory — entropy, cross-entropy, KL divergence"],
+    [34,"Optimization — gradient descent worked by hand"],
+    [35,"Review — worked problem set"],
+    [36,"Project: statistical analysis notebook on real data","port"],
+  ]},
+  { idx:"P3", title:"Data Engineering & Pipelines", note:"pandas, feature pipelines, batch & streaming — the JD's data fundamentals", days:[
+    [37,"pandas 1 — Series/DataFrame, indexing, selection"],
+    [38,"pandas 2 — groupby, merge/join, pivot"],
+    [39,"pandas 3 — missing data, dtypes, datetime, resampling"],
+    [40,"Data cleaning end-to-end on messy data"],
+    [41,"EDA & visualization — matplotlib/seaborn"],
+    [42,"Feature engineering 1 — encoding, scaling"],
+    [43,"Feature engineering 2 — datetime, text, interactions"],
+    [44,"Data validation — pandera / great_expectations"],
+    [45,"SQL for data — joins, aggregations, window functions"],
+    [46,"Batch pipelines — structuring reproducible ETL",null,true],
+    [47,"Streaming concepts — event data, windows",null,true],
+    [48,"Feature store concept — offline/online features"],
+    [49,"Review + data pipeline patterns"],
+    [50,"Project: reusable feature pipeline module","port"],
+  ]},
+  { idx:"P4", title:"Core Machine Learning", note:"scikit-learn end to end — the models the JD actually names", days:[
+    [51,"ML framing — supervised/unsupervised, splits, over/underfit"],
+    [52,"Linear regression from scratch + scikit-learn"],
+    [53,"Regression metrics — MAE/RMSE/R²"],
+    [54,"Regularization — Ridge, Lasso, ElasticNet"],
+    [55,"Logistic regression & classification framing"],
+    [56,"Classification metrics — precision/recall/F1/ROC-AUC"],
+    [57,"Thresholds, PR curves, calibration"],
+    [58,"Class imbalance — SMOTE, class weights"],
+    [59,"k-Nearest Neighbors"],
+    [60,"Naive Bayes"],
+    [61,"Decision trees"],
+    [62,"Random forests & bagging"],
+    [63,"Gradient boosting 1 — concept, XGBoost"],
+    [64,"Gradient boosting 2 — LightGBM/CatBoost, tuning"],
+    [65,"Cross-validation strategies"],
+    [66,"Hyperparameter tuning — grid/random/Bayesian (Optuna)"],
+    [67,"scikit-learn Pipelines & ColumnTransformer"],
+    [68,"Feature selection & data-leakage avoidance"],
+    [69,"Unsupervised — K-Means & cluster evaluation"],
+    [70,"Unsupervised — hierarchical & DBSCAN"],
+    [71,"Dimensionality reduction — PCA"],
+    [72,"Dimensionality reduction — t-SNE / UMAP"],
+    [73,"Anomaly detection — Isolation Forest, LOF (maps to your alerting work)",null,true],
+    [74,"Time-series 1 — decomposition, stationarity"],
+    [75,"Time-series 2 — ARIMA family"],
+    [76,"Time-series 3 — ML forecasting, lag features, Prophet"],
+    [77,"Explainability — SHAP, feature importance, PDPs"],
+    [78,"Evaluation deep-dive — bias/variance, learning curves"],
+    [79,"Review + Kaggle-style practice"],
+    [80,"Project: end-to-end tabular ML (classification or anomaly)","port"],
+  ]},
+  { idx:"P5", title:"Deep Learning", note:"PyTorch, CNNs, and transformers — enough depth to own LLMs later", days:[
+    [81,"Neural net fundamentals — perceptron, activations"],
+    [82,"Forward pass & loss functions"],
+    [83,"Backprop & gradient descent (build intuition)"],
+    [84,"PyTorch 1 — tensors & autograd"],
+    [85,"PyTorch 2 — nn.Module, build a network"],
+    [86,"PyTorch 3 — DataLoaders, training loop, GPU"],
+    [87,"Optimizers — SGD, Adam; learning-rate schedules"],
+    [88,"Regularization — dropout, batchnorm, early stopping"],
+    [89,"TensorFlow/Keras equivalent (breadth for the JD)"],
+    [90,"CNN 1 — convolutions, pooling"],
+    [91,"CNN 2 — image classification project"],
+    [92,"Transfer learning — fine-tune a pretrained model"],
+    [93,"RNN/LSTM — sequence modeling"],
+    [94,"Attention mechanism — intuition"],
+    [95,"Transformers 1 — the architecture"],
+    [96,"Transformers 2 — using Hugging Face"],
+    [97,"Embeddings — word & sentence embeddings"],
+    [98,"Fine-tuning a transformer (text classification)"],
+    [99,"Model optimization — quantization, ONNX, latency"],
+    [100,"Experiment tracking for DL (Weights & Biases / MLflow)"],
+    [101,"Review + deep-learning debugging skills"],
+    [102,"Project: deep-learning model (vision or text)","port"],
+  ]},
+  { idx:"P6", title:"MLOps & Productionization", note:"Your home turf — apply the SRE stack to ML and make it the spine", days:[
+    [103,"MLOps overview — maturity levels, the stack",null,true],
+    [104,"Packaging a model — serialization, artifacts"],
+    [105,"Serving 1 — FastAPI model API",null,true],
+    [106,"Serving 2 — batch vs online inference"],
+    [107,"Containerize — Docker for ML workloads",null,true],
+    [108,"Kubernetes for ML — deploy on AKS",null,true],
+    [109,"Helm charts for ML services",null,true],
+    [110,"CI/CD for ML 1 — pipeline design (GitHub Actions/ADO)",null,true],
+    [111,"CI/CD for ML 2 — automated testing of models & data",null,true],
+    [112,"Model & data versioning — DVC"],
+    [113,"Monitoring 1 — latency/throughput/health (golden signals)",null,true],
+    [114,"Monitoring 2 — data drift & model drift detection"],
+    [115,"Retraining pipelines & triggers",null,true],
+    [116,"Feature/serving skew; shadow & canary deploys",null,true],
+    [117,"ML security — secrets, RBAC, supply chain",null,true],
+    [118,"Cost & capacity for ML / GPU workloads",null,true],
+    [119,"Review + reference architecture"],
+    [120,"Project: containerized model served on AKS with CI/CD","port",true],
+  ]},
+  { idx:"P7", title:"Azure ML + Databricks + MLflow", note:"The named Azure stack — where your infra instincts pay off fastest", days:[
+    [121,"Azure ML workspace — provision with Terraform",null,true],
+    [122,"Azure ML — compute, datastores, datasets"],
+    [123,"Azure ML — environments & training jobs"],
+    [124,"Azure ML — pipelines & components"],
+    [125,"MLflow 1 — experiment tracking"],
+    [126,"MLflow 2 — model registry & versions"],
+    [127,"Governed promotion — Dev/Test/Prod stages"],
+    [128,"Azure ML — managed online endpoints"],
+    [129,"Azure ML — batch endpoints"],
+    [130,"Responsible AI dashboard"],
+    [131,"Databricks 1 — workspace, clusters, notebooks"],
+    [132,"Databricks 2 — Spark DataFrames"],
+    [133,"Databricks 3 — batch feature pipelines"],
+    [134,"Databricks 4 — structured streaming"],
+    [135,"Delta Lake — tables, time travel, lineage"],
+    [136,"Databricks Feature Store"],
+    [137,"Drift monitoring in Azure ML"],
+    [138,"Security & lineage — Key Vault, managed identity, audit",null,true],
+    [139,"Review + Azure ML reference flow"],
+    [140,"Project: Azure ML train → register → deploy → monitor","port"],
+  ]},
+  { idx:"P8", title:"Generative AI & LLMs", note:"Azure OpenAI, embeddings, vector search, RAG, and fine-tuning", days:[
+    [141,"LLM landscape; how GenAI differs from classic ML"],
+    [142,"Azure OpenAI — provision (Terraform), models, quotas",null,true],
+    [143,"Prompt engineering 1 — patterns, few-shot"],
+    [144,"Prompt engineering 2 — structured output, function calling"],
+    [145,"Prompt optimization & evaluation"],
+    [146,"Embeddings — generating & measuring similarity"],
+    [147,"Vector search 1 — vector DBs, Azure AI Search"],
+    [148,"Vector search 2 — indexing strategies"],
+    [149,"RAG 1 — architecture, chunking"],
+    [150,"RAG 2 — build a basic RAG app"],
+    [151,"RAG 3 — retrieval quality, reranking"],
+    [152,"RAG 4 — evaluation (groundedness, relevance)"],
+    [153,"LangChain 1 — chains, prompts, models"],
+    [154,"LangChain 2 — retrievers, memory"],
+    [155,"LLM risks — hallucination, prompt injection, security"],
+    [156,"LLM cost & latency — caching, batching, routing"],
+    [157,"LLM observability — tracing, evals",null,true],
+    [158,"Guardrails & content safety"],
+    [159,"Fine-tuning vs RAG — decision framework"],
+    [160,"Fine-tuning an LLM — LoRA (concept + hands-on)"],
+    [161,"Review + RAG architecture patterns"],
+    [162,"Project: production-style RAG on Azure OpenAI + AI Search","port"],
+  ]},
+  { idx:"P9", title:"Agentic AI", note:"LangGraph, tool calling, guardrails, MCP", days:[
+    [163,"Agent concepts — reasoning loops, ReAct"],
+    [164,"Tool calling — schemas, function use"],
+    [165,"LangGraph 1 — graph-based workflows"],
+    [166,"LangGraph 2 — state & memory management"],
+    [167,"Multi-step reasoning & planning"],
+    [168,"Guardrails & safety controls for agents"],
+    [169,"Agent observability, reliability & cost control",null,true],
+    [170,"Model Context Protocol (MCP) — concepts & integration"],
+    [171,"Multi-agent patterns"],
+    [172,"Evaluating agents"],
+    [173,"Review + agent architecture patterns"],
+    [174,"Project: production agent with tools + guardrails + tracing","port"],
+  ]},
+  { idx:"P10", title:"Capstone & Interview Prep", note:"Tie it together, then sell it", days:[
+    [175,"Capstone 1 — scope an end-to-end system (data → model → GenAI/agent → serve)"],
+    [176,"Capstone 2 — build the core"],
+    [177,"Capstone 3 — deploy on Azure with CI/CD",null,true],
+    [178,"Capstone 4 — monitoring, docs, architecture diagram"],
+    [179,"Resume rewrite — reframe SRE/AIOps as ML-production experience",null,true],
+    [180,"Interview prep — ML fundamentals + coding"],
+    [181,"Interview prep — system design (Azure ML/GenAI platform)"],
+    [182,"Interview prep — behavioral STAR + JD-specific mock; portfolio polish","port"],
+  ]},
+];
+
+const KEY = "aiml182_progress_v1";
+const TOTAL = 182;
+let done = {};
+try { done = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ done = {}; }
+
+const phasesEl = document.getElementById("phases");
+
+PLAN.forEach((p, pi) => {
+  const phase = document.createElement("div");
+  phase.className = "phase" + (pi === 0 ? " open" : "");
+  const span = `${p.days[0][0]}–${p.days[p.days.length-1][0]}`;
+
+  const head = document.createElement("div");
+  head.className = "phase-head";
+  head.innerHTML = `
+    <span class="phase-idx">${p.idx}</span>
+    <span class="phase-title">${p.title}<small>${p.note}</small></span>
+    <span class="phase-meta" data-count>Days ${span}</span>
+    <span class="chev">▶</span>`;
+  head.addEventListener("click", () => phase.classList.toggle("open"));
+
+  const body = document.createElement("div");
+  body.className = "phase-body";
+
+  p.days.forEach(d => {
+    const [n, text, tag, strength] = d;
+    const row = document.createElement("label");
+    row.className = "day" + (done[n] ? " done" : "");
+    let tags = "";
+    if (tag === "port") tags += `<span class="tag port">◆ Portfolio</span>`;
+    if (strength) tags += `<span class="tag str">▲ Your strength</span>`;
+    row.innerHTML = `
+      <input type="checkbox" ${done[n] ? "checked":""}>
+      <span class="dnum">Day ${String(n).padStart(3," ")}</span>
+      <span class="dtxt">${text}${tags}</span>`;
+    row.querySelector("input").addEventListener("change", e => {
+      if (e.target.checked) done[n] = 1; else delete done[n];
+      localStorage.setItem(KEY, JSON.stringify(done));
+      row.classList.toggle("done", e.target.checked);
+      refresh();
+    });
+    body.appendChild(row);
+  });
+
+  phase.appendChild(head);
+  phase.appendChild(body);
+  phasesEl.appendChild(phase);
+});
+
+function refresh(){
+  const count = Object.keys(done).length;
+  const pct = Math.round(count/TOTAL*100);
+  document.getElementById("doneCount").textContent = count;
+  document.getElementById("pct").textContent = pct + "%";
+  document.getElementById("barFill").style.width = pct + "%";
+  document.querySelectorAll(".phase").forEach((ph, i) => {
+    const p = PLAN[i];
+    const total = p.days.length;
+    const dn = p.days.filter(d => done[d[0]]).length;
+    const span = `${p.days[0][0]}–${p.days[p.days.length-1][0]}`;
+    const meta = ph.querySelector("[data-count]");
+    meta.textContent = dn === total ? `✓ Days ${span}` : `${dn}/${total} · Days ${span}`;
+    meta.style.color = dn === total ? "var(--teal)" : "var(--muted)";
+  });
+}
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (!confirm("Clear all checked days?")) return;
+  done = {}; localStorage.removeItem(KEY);
+  document.querySelectorAll(".day input").forEach(cb => cb.checked = false);
+  document.querySelectorAll(".day").forEach(r => r.classList.remove("done"));
+  refresh();
+});
+
+refresh();
+</script>
+</body>
+</html>

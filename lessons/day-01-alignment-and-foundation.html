@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 01 — Alignment & Foundation (Terraform)</title>
+<style>
+  :root{
+    --bg:#ffffff; --paper:#fafbfc; --line:#e4e8ee; --line-2:#eef1f5;
+    --ink:#111927; --body:#374151; --muted:#6b7280; --dim:#9aa4b2;
+    --teal:#0f766e; --teal-soft:#e6f4f2;
+    --indigo:#4338ca;
+    --amber:#b45309;
+    --violet:#7c3aed;
+    --rose:#be123c;
+    --code-bg:#f6f8fa;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--body);font-size:15px;line-height:1.6;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 90px}
+  code,pre,.mono{font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace}
+  p code,td code,li code,.a code,summary code{background:var(--code-bg);border:1px solid var(--line);
+    padding:1px 5px;border-radius:5px;font-size:.88em;color:#0b3b37}
+  a{color:var(--teal)}
+
+  /* Header */
+  header{border:1px solid var(--line);border-top:3px solid var(--teal);border-radius:var(--radius);
+    padding:22px 24px;background:var(--paper)}
+  .eyebrow{font-family:"SF Mono",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--teal);margin:0 0 10px}
+  .daybadge{display:inline-block;font-family:"SF Mono",monospace;font-weight:700;font-size:12px;
+    background:var(--teal);color:#fff;padding:3px 9px;border-radius:6px;margin-right:10px}
+  h1{margin:4px 0 8px;font-size:26px;line-height:1.2;letter-spacing:-.4px;color:var(--ink)}
+  .obj{color:var(--muted);margin:0;max-width:730px}
+  .hmeta{margin-top:14px;display:flex;gap:20px;flex-wrap:wrap;font-family:"SF Mono",monospace;
+    font-size:11.5px;color:var(--dim)}
+  .hmeta b{color:var(--body);font-weight:600}
+
+  /* Tabs */
+  nav.tabs{display:flex;gap:2px;margin:22px 0 0;border-bottom:2px solid var(--line);flex-wrap:wrap}
+  .tab{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;font-weight:600;
+    padding:11px 16px;border-bottom:2px solid transparent;font-family:inherit;position:relative;bottom:-2px}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+  .panel{display:none;padding-top:26px}
+  .panel.active{display:block}
+
+  h2{font-size:19px;margin:30px 0 12px;letter-spacing:-.2px;color:var(--ink)}
+  h2:first-child{margin-top:0}
+  h3{font-size:15px;margin:22px 0 8px;color:var(--ink)}
+  p{margin:10px 0}
+  .lead{color:var(--muted)}
+
+  /* Callouts */
+  .call{border:1px solid var(--line);border-left:3px solid var(--teal);background:var(--bg);
+    padding:12px 16px;border-radius:8px;margin:16px 0}
+  .call.amber{border-left-color:var(--amber)} .call.warn{border-left-color:var(--rose)}
+  .call .k{font-family:"SF Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--teal);display:block;margin-bottom:4px}
+  .call.amber .k{color:var(--amber)} .call.warn .k{color:var(--rose)}
+
+  /* Buckets */
+  .buckets{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+  @media(max-width:760px){.buckets{grid-template-columns:1fr}}
+  .bkt{border:1px solid var(--line);border-radius:10px;padding:14px 14px 8px;background:var(--paper)}
+  .bkt h4{margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+  .bkt.have h4{color:var(--indigo)} .bkt.bridge h4{color:var(--violet)} .bkt.build h4{color:var(--teal)}
+  .bkt ul{margin:0;padding-left:18px} .bkt li{margin:5px 0;font-size:13px;color:var(--body)}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{color:var(--teal);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+    border-bottom:2px solid var(--line)}
+  td:first-child{color:var(--ink);font-weight:500}
+  tbody tr:hover{background:var(--paper)}
+
+  /* Code */
+  .code{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:14px 0;background:var(--code-bg)}
+  .codebar{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;
+    background:#eef1f5;border-bottom:1px solid var(--line)}
+  .codebar .fname{font-family:"SF Mono",monospace;font-size:11.5px;color:var(--muted)}
+  .copy{background:#fff;border:1px solid var(--line);color:var(--muted);cursor:pointer;font-size:10.5px;
+    padding:3px 9px;border-radius:6px;font-family:"SF Mono",monospace}
+  .copy:hover{color:var(--teal);border-color:var(--teal)}
+  pre{margin:0;padding:13px 16px;overflow-x:auto;font-size:13px;line-height:1.6}
+  pre code{color:#0f2e2a;white-space:pre}
+  .cmt{color:#8a94a2}
+
+  /* Lab */
+  .lab{border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:20px 0;background:var(--paper)}
+  .lab-h{display:flex;align-items:center;gap:10px;margin:0 0 6px;flex-wrap:wrap}
+  .lab-n{font-family:"SF Mono",monospace;font-size:11px;background:var(--teal-soft);color:var(--teal);
+    padding:3px 8px;border-radius:6px;font-weight:700}
+  .lab-h h3{margin:0}
+  .pill{font-family:"SF Mono",monospace;font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;margin-left:auto}
+  .pill.tf{color:var(--violet);border:1px solid #ddd0f5}
+  .pill.core{color:var(--amber);border:1px solid #f0dcc0}
+  .task{color:var(--body)}
+  .ans{margin-top:12px}
+  .ans-btn{background:#fff;border:1px dashed var(--teal);color:var(--teal);cursor:pointer;
+    font-size:12.5px;padding:8px 14px;border-radius:8px;font-family:inherit;font-weight:600}
+  .ans-btn:hover{background:var(--teal-soft)}
+  .ans-body{display:none;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+  .ans-body.open{display:block}
+  .ans-body h5{margin:14px 0 6px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
+  .ans-body h5:first-child{margin-top:0}
+
+  /* Q&A */
+  .qa{border:1px solid var(--line);border-radius:10px;margin:14px 0;overflow:hidden;background:var(--bg)}
+  .qa summary{cursor:pointer;padding:14px 16px;font-weight:600;list-style:none;display:flex;gap:10px;
+    align-items:flex-start;color:var(--ink)}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary::before{content:"Q";font-family:"SF Mono",monospace;color:var(--teal);font-weight:700;flex:none}
+  .qa[open] summary{border-bottom:1px solid var(--line);background:var(--paper)}
+  .qa .a{padding:14px 16px 16px 42px;color:var(--body);font-size:14px}
+  .qa .a strong{color:var(--ink)}
+  .qtag{font-family:"SF Mono",monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;
+    margin-left:auto;padding:2px 7px;border-radius:5px;color:var(--dim);border:1px solid var(--line);flex:none}
+
+  /* Progress */
+  .chk{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line-2)}
+  .chk input{appearance:none;-webkit-appearance:none;width:19px;height:19px;border:1.5px solid var(--dim);
+    border-radius:6px;background:#fff;cursor:pointer;flex:none;margin-top:2px;position:relative}
+  .chk input:checked{background:var(--teal);border-color:var(--teal)}
+  .chk input:checked::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;color:#fff;font-size:12px;font-weight:800}
+  .chk.done span{color:var(--dim);text-decoration:line-through}
+  .pbar{height:8px;background:#eef1f5;border:1px solid var(--line);border-radius:99px;overflow:hidden;margin:8px 0 20px}
+  .pbar i{display:block;height:100%;width:0;background:var(--teal);transition:width .3s}
+  .say{border:1px solid var(--line);border-left:3px solid var(--indigo);border-radius:8px;padding:16px;margin-top:20px}
+  .say li{margin:8px 0;color:var(--body)}
+  .nextbtn{display:inline-block;margin-top:18px;color:var(--teal);border:1px solid var(--teal);
+    padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13.5px}
+
+  /* Print */
+  @media print{
+    body{font-size:11.5pt;color:#000}
+    .wrap{padding:0;max-width:none}
+    nav.tabs,.copy,.ans-btn,.nextbtn{display:none!important}
+    .panel{display:block!important;padding-top:18px;page-break-before:always}
+    .panel:first-of-type{page-break-before:avoid}
+    .ans-body{display:block!important}
+    .qa .a{display:block!important}
+    header{border:1px solid #000}
+    .code,.lab,.qa,table,.call,.buckets{page-break-inside:avoid}
+    a{color:#000;text-decoration:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">AI/ML Engineer · 182-Day Track · Phase 0</p>
+    <h1><span class="daybadge">DAY 01</span>Alignment &amp; Foundation</h1>
+    <p class="obj">Read the JD like an SRE, sort every requirement into <b>have / bridge / build</b>, then provision your Azure learning foundation as Terraform — so your first artifact already satisfies the JD's "reproducible, auditable infrastructure" line.</p>
+    <div class="hmeta">
+      <span><b>Est. time</b> 90–120 min</span>
+      <span><b>Stack</b> Terraform · Azure · Python · Git</span>
+      <span><b>Cost</b> ~₹0 idle (destroy after)</span>
+      <span><b>Portfolio</b> repo + IaC foundation</span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="learn">Learn</button>
+    <button class="tab" data-tab="labs">Labs</button>
+    <button class="tab" data-tab="ref">Reference</button>
+    <button class="tab" data-tab="qa">Q&amp;A</button>
+    <button class="tab" data-tab="prog">Progress</button>
+  </nav>
+
+  <!-- ===================== LEARN ===================== -->
+  <section class="panel active" id="learn">
+    <h2>You are not starting over</h2>
+    <p class="lead">A "Senior AI/ML Engineer" title makes it sound like you'd be a junior again. You won't. Read the JD carefully and you'll see it's split roughly in half: one half is <em>modeling</em> (ML, deep learning, GenAI, agents) and the other half is <em>operating models in production reliably, securely, and at scale</em> — CI/CD, Docker, Kubernetes/AKS, Helm, monitoring, RBAC, Key Vault, auditable infra changes. That second half is your day job as an SRE lead. Today is about seeing that clearly and building on it.</p>
+
+    <h2>Sort the JD into three buckets</h2>
+    <p>Every requirement goes into exactly one bucket. This is the single most useful thing you'll do this week — it tells you where <em>not</em> to spend time, and it becomes your interview narrative.</p>
+    <div class="buckets">
+      <div class="bkt have">
+        <h4>▲ Have — reframe it</h4>
+        <ul>
+          <li>Run systems in production at scale</li>
+          <li>Docker · Kubernetes / AKS · Helm</li>
+          <li>CI/CD &amp; automation</li>
+          <li>Monitoring &amp; observability</li>
+          <li>RBAC · Key Vault · secrets</li>
+          <li>Reviewable, auditable infra (IaC)</li>
+        </ul>
+      </div>
+      <div class="bkt bridge">
+        <h4>◆ Bridge — short hop</h4>
+        <ul>
+          <li>Anomaly detection ← alerting</li>
+          <li>Drift / quality monitoring ← observability</li>
+          <li>Cost control ← capacity / FinOps</li>
+          <li>ML pipelines ← Jenkins / Ansible</li>
+          <li>Data ingestion ← log/metric pipelines</li>
+        </ul>
+      </div>
+      <div class="bkt build">
+        <h4>→ Build — net-new</h4>
+        <ul>
+          <li>Supervised / unsupervised modeling</li>
+          <li>scikit-learn · PyTorch / TF · SHAP</li>
+          <li>Azure ML · MLflow · Databricks</li>
+          <li>Azure OpenAI · embeddings · RAG</li>
+          <li>LangChain · LangGraph · MCP</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call">
+      <span class="k">The point</span>
+      Roughly half the JD is already yours. The plan spends almost all its time on the <b>Build</b> column, treats <b>Bridge</b> as quick wins, and teaches you to <b>reframe</b> the Have column into ML language for interviews.
+    </div>
+
+    <h2>The mapping that makes you dangerous</h2>
+    <p>The ML lifecycle in the JD's first responsibility ("data ingestion → training → deployment → monitoring → retraining → rollback") is the SRE lifecycle wearing a lab coat. Internalize this table — you'll reuse it in every interview.</p>
+    <table>
+      <thead><tr><th>ML lifecycle (JD)</th><th>Your SRE equivalent</th></tr></thead>
+      <tbody>
+        <tr><td>Data ingestion / feature pipelines</td><td>Log &amp; metric pipelines, ETL, Ansible-driven data flows</td></tr>
+        <tr><td>Training / experiment tracking</td><td>Build jobs, versioned artifacts, reproducible runs</td></tr>
+        <tr><td>Deployment (endpoints, AKS)</td><td>Release engineering, K8s rollout, Helm</td></tr>
+        <tr><td>Monitoring: drift, quality, latency</td><td>Golden signals, dashboards, alerting (Splunk/Dynatrace)</td></tr>
+        <tr><td>Retraining triggers</td><td>Automated remediation / scheduled CD</td></tr>
+        <tr><td>Rollback</td><td>Rollback — identical concept, versioned model instead of image</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Why we open with Terraform (not a notebook)</h2>
+    <p>Look at the MLOps section of the JD: <em>"Reproducible environments · Controlled configuration management · Reviewable and auditable infrastructure changes."</em> That's a description of Terraform. Instead of clicking around the Azure portal to set up your learning environment, you'll declare it as code. Two wins: you get a clean, destroyable foundation for the rest of the track, and your <em>first</em> portfolio artifact is literally a JD requirement, demonstrated. Head to the Labs tab.</p>
+
+    <div class="call amber">
+      <span class="k">Today's mission</span>
+      1&nbsp;· Verify your toolchain &nbsp; 2&nbsp;· Bootstrap a Python + Git portfolio repo &nbsp; 3&nbsp;· Provision an Azure foundation (Resource Group + Storage + Key Vault) with Terraform &nbsp; 4&nbsp;· Complete the gap-map worksheet. Every lab has a worked answer.
+    </div>
+  </section>
+
+  <!-- ===================== LABS ===================== -->
+  <section class="panel" id="labs">
+    <p class="lead">Do each task first, then reveal the answer to check your work and expected output. Assumes WSL / Linux or macOS shell. Windows PowerShell notes are inline where they differ.</p>
+
+    <!-- Lab 0 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 0</span><h3>Verify the toolchain</h3><span class="pill core">Core</span></div>
+      <p class="task">You can't provision infrastructure you can't call. Confirm the four tools this track depends on are installed and on a sane version.</p>
+      <div class="code">
+        <div class="codebar"><span class="fname">verify.sh</span><button class="copy">copy</button></div>
+        <pre><code>python3 --version    <span class="cmt"># expect 3.10+</span>
+terraform version    <span class="cmt"># expect 1.6+</span>
+az version           <span class="cmt"># Azure CLI</span>
+git --version</code></pre>
+      </div>
+      <div class="ans">
+        <button class="ans-btn">Show answer ▸</button>
+        <div class="ans-body">
+          <h5>Expected</h5>
+          <p>Each command prints a version, e.g. <code>Terraform v1.9.x</code>, <code>Python 3.11.x</code>. If any is "command not found":</p>
+          <div class="code"><div class="codebar"><span class="fname">install (Ubuntu/WSL)</span><button class="copy">copy</button></div>
+          <pre><code><span class="cmt"># Terraform (HashiCorp apt repo)</span>
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp.gpg
+<span class="cmt"># Azure CLI (one-liner)</span>
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+<span class="cmt"># then:</span>
+az login   <span class="cmt"># opens a browser; pick your PAYG subscription</span></code></pre></div>
+          <h5>Gotcha</h5>
+          <p>On WSL, <code>az login</code> sometimes can't open a browser — use <code>az login --use-device-code</code> and paste the code into a browser on Windows.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab 1 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 1</span><h3>Bootstrap the portfolio repo</h3><span class="pill core">Core</span></div>
+      <p class="task">Create the repo you'll grow across the track: an isolated Python virtual environment, the core ML libraries, a sane <code>.gitignore</code> (never commit state files or secrets), and a first commit.</p>
+      <div class="code"><div class="codebar"><span class="fname">bootstrap.sh</span><button class="copy">copy</button></div>
+      <pre><code>mkdir ai-ml-182day
+cd ai-ml-182day
+
+python3 -m venv .venv
+source .venv/bin/activate        <span class="cmt"># Windows: .venv\Scripts\activate</span>
+python -m pip install --upgrade pip
+pip install numpy pandas scikit-learn jupyter
+pip freeze > requirements.txt
+
+git init
+printf '.venv/\n__pycache__/\n*.pyc\n.terraform/\n*.tfstate*\nterraform.tfvars\n.env\n' > .gitignore
+git add .
+git commit -m "chore: bootstrap ai-ml portfolio"</code></pre></div>
+      <div class="ans">
+        <button class="ans-btn">Show answer ▸</button>
+        <div class="ans-body">
+          <h5>Why each line matters</h5>
+          <p><strong>venv</strong> isolates dependencies so Day 40's PyTorch can't break Day 10's pandas. <strong>requirements.txt</strong> makes the environment reproducible — the same idea as pinning image versions. The <strong>.gitignore</strong> is the important one: <code>*.tfstate*</code> and <code>terraform.tfvars</code> and <code>.env</code> keep Terraform state (which can contain secrets in plaintext) and credentials out of Git. Committing state to a public repo is a classic, costly leak.</p>
+          <h5>Verify</h5>
+          <div class="code"><div class="codebar"><span class="fname">shell</span><button class="copy">copy</button></div>
+          <pre><code>git log --oneline     <span class="cmt"># one commit shown</span>
+git status --ignored  <span class="cmt"># .venv/ etc. listed as ignored, not staged</span></code></pre></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab 2 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 2</span><h3>Provision the Azure foundation with Terraform</h3><span class="pill tf">Terraform</span></div>
+      <p class="task">Declare a Resource Group + Storage Account + Key Vault as code. This is the shared foundation the Azure ML labs (Days 121–140) will build on. Create the four files below in an <code>infra/</code> folder inside your repo, then run the workflow.</p>
+
+      <div class="code"><div class="codebar"><span class="fname">infra/versions.tf</span><button class="copy">copy</button></div>
+      <pre><code>terraform {
+  required_version = ">= 1.6"
+  required_providers {
+    azurerm = { source = "hashicorp/azurerm", version = "~> 4.0" }
+    random  = { source = "hashicorp/random",  version = "~> 3.6" }
+  }
+}
+
+provider "azurerm" {
+  features {}
+  subscription_id = var.subscription_id   <span class="cmt"># required in azurerm v4</span>
+}</code></pre></div>
+
+      <div class="code"><div class="codebar"><span class="fname">infra/variables.tf</span><button class="copy">copy</button></div>
+      <pre><code>variable "subscription_id" {
+  type        = string
+  description = "Your Azure subscription ID"
+}
+variable "location" {
+  type    = string
+  default = "centralindia"
+}
+variable "prefix" {
+  type    = string
+  default = "mllab"
+}</code></pre></div>
+
+      <div class="code"><div class="codebar"><span class="fname">infra/main.tf</span><button class="copy">copy</button></div>
+      <pre><code>resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_resource_group" "ml" {
+  name     = "${var.prefix}-rg"
+  location = var.location
+  tags     = { purpose = "ai-ml-182day", owner = "thrilochana" }
+}
+
+resource "azurerm_storage_account" "ml" {
+  name                     = "${var.prefix}sa${random_string.suffix.result}"
+  resource_group_name      = azurerm_resource_group.ml.name
+  location                 = azurerm_resource_group.ml.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  tags                     = azurerm_resource_group.ml.tags
+}
+
+resource "azurerm_key_vault" "ml" {
+  name                       = "${var.prefix}-kv-${random_string.suffix.result}"
+  resource_group_name        = azurerm_resource_group.ml.name
+  location                   = azurerm_resource_group.ml.location
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  sku_name                   = "standard"
+  soft_delete_retention_days = 7
+  purge_protection_enabled   = false
+  rbac_authorization_enabled  = true
+}
+
+<span class="cmt"># Grant *yourself* rights to write secrets (used in Lab 3)</span>
+resource "azurerm_role_assignment" "kv_secrets" {
+  scope                = azurerm_key_vault.ml.id
+  role_definition_name = "Key Vault Secrets Officer"
+  principal_id         = data.azurerm_client_config.current.object_id
+}</code></pre></div>
+
+      <div class="code"><div class="codebar"><span class="fname">infra/outputs.tf</span><button class="copy">copy</button></div>
+      <pre><code>output "resource_group"  { value = azurerm_resource_group.ml.name }
+output "storage_account" { value = azurerm_storage_account.ml.name }
+output "key_vault_uri"   { value = azurerm_key_vault.ml.vault_uri }</code></pre></div>
+
+      <div class="code"><div class="codebar"><span class="fname">run the workflow</span><button class="copy">copy</button></div>
+      <pre><code>cd infra
+az login                                     <span class="cmt"># if not already</span>
+export TF_VAR_subscription_id=$(az account show --query id -o tsv)
+
+terraform init      <span class="cmt"># downloads providers</span>
+terraform fmt       <span class="cmt"># auto-format (habit)</span>
+terraform validate  <span class="cmt"># static checks</span>
+terraform plan      <span class="cmt"># READ THIS before applying</span>
+terraform apply     <span class="cmt"># type: yes</span></code></pre></div>
+
+      <div class="ans">
+        <button class="ans-btn">Show answer ▸</button>
+        <div class="ans-body">
+          <h5>What plan should say</h5>
+          <p><code>Plan: 5 to add, 0 to change, 0 to destroy.</code> — the RG, storage account, key vault, role assignment, and the random suffix. If it says anything to <em>change</em> or <em>destroy</em> on a first run, stop and read why.</p>
+          <h5>What apply should end with</h5>
+          <div class="code"><div class="codebar"><span class="fname">output</span><button class="copy">copy</button></div>
+          <pre><code>Apply complete! Resources: 5 added, 0 changed, 0 destroyed.
+
+Outputs:
+key_vault_uri   = "https://mllab-kv-a1b2c3.vault.azure.net/"
+resource_group  = "mllab-rg"
+storage_account = "mllabsaa1b2c3"</code></pre></div>
+          <h5>Verify out-of-band (trust, but confirm)</h5>
+          <div class="code"><div class="codebar"><span class="fname">shell</span><button class="copy">copy</button></div>
+          <pre><code>az group show -n mllab-rg -o table
+terraform state list   <span class="cmt"># the 5 objects Terraform now manages</span></code></pre></div>
+          <h5>Design notes (interview-ready)</h5>
+          <p><strong>Random suffix:</strong> storage account and Key Vault names are <em>globally</em> unique across all of Azure, so a random 6-char suffix avoids "name already taken" failures. <strong>RBAC auth on the vault</strong> (<code>rbac_authorization_enabled = true</code>) uses Azure roles instead of legacy access policies — the modern, auditable pattern the JD implies. <strong>Tags</strong> give you cost attribution and ownership, exactly like tagging infra in prod.</p>
+          <h5>Common failures &amp; fixes</h5>
+          <table>
+            <thead><tr><th>Error</th><th>Fix</th></tr></thead>
+            <tbody>
+              <tr><td><code>subscription_id is required</code></td><td>You skipped the export. Run <code>export TF_VAR_subscription_id=$(az account show --query id -o tsv)</code></td></tr>
+              <tr><td>Role assignment: <code>AuthorizationFailed</code></td><td>Your account isn't Owner/User&nbsp;Access&nbsp;Administrator on the subscription. On a personal PAYG sub you usually are — re-check <code>az account show</code> points to the right one.</td></tr>
+              <tr><td>Vault name in "soft-deleted" state</td><td>You destroyed &amp; recreated. Either change <code>prefix</code>, or purge: <code>az keyvault purge --name &lt;old-name&gt;</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab 3 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 3</span><h3>Store a secret in Key Vault (as code)</h3><span class="pill tf">Terraform</span></div>
+      <p class="task">The JD calls out "Azure Key Vault and secure ML practices." Add a secret to your vault declaratively — the same mechanism you'll later use for an Azure OpenAI key. Append this to <code>main.tf</code>, then <code>apply</code> again.</p>
+      <div class="code"><div class="codebar"><span class="fname">infra/main.tf (append)</span><button class="copy">copy</button></div>
+      <pre><code>resource "azurerm_key_vault_secret" "demo" {
+  name         = "demo-api-key"
+  value        = "placeholder-rotate-me"
+  key_vault_id = azurerm_key_vault.ml.id
+  depends_on   = [azurerm_role_assignment.kv_secrets]
+}</code></pre></div>
+      <div class="ans">
+        <button class="ans-btn">Show answer ▸</button>
+        <div class="ans-body">
+          <h5>Why <code>depends_on</code></h5>
+          <p>Writing a secret needs the "Secrets Officer" role to already exist. Terraform can't infer that ordering from the attributes alone, so you declare it explicitly. Without it, the secret write can race the role assignment and fail with a 403.</p>
+          <h5>Verify</h5>
+          <div class="code"><div class="codebar"><span class="fname">shell</span><button class="copy">copy</button></div>
+          <pre><code>az keyvault secret show --vault-name &lt;your-kv-name&gt; --name demo-api-key --query value -o tsv
+<span class="cmt"># -> placeholder-rotate-me</span></code></pre></div>
+          <h5>The real-world caveat</h5>
+          <p>That secret value now sits in <em>plaintext inside your Terraform state file</em> — which is exactly why <code>*.tfstate*</code> is in your <code>.gitignore</code>. In production you'd use a remote backend (Azure Storage) with encryption and access control, and inject secrets at runtime rather than hardcoding them. Good instinct to flag in an interview. (You'll set up that remote backend on Day 2.)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab 4 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 4</span><h3>Gap-map worksheet</h3><span class="pill core">Analysis</span></div>
+      <p class="task">For each JD line below, write the bucket (<code>Have</code> / <code>Bridge</code> / <code>Build</code>) and, for Have/Bridge items, one sentence reframing your SRE experience into it. Do it before revealing the model answer.</p>
+      <table>
+        <thead><tr><th>JD line</th><th>Your bucket + reframe</th></tr></thead>
+        <tbody>
+          <tr><td>Deploy ML workloads on Kubernetes (AKS) with Helm</td><td>______</td></tr>
+          <tr><td>Monitoring for data drift, model drift, latency, system health</td><td>______</td></tr>
+          <tr><td>RAG pipelines with Azure OpenAI</td><td>______</td></tr>
+          <tr><td>Anomaly detection use cases</td><td>______</td></tr>
+          <tr><td>Reviewable, auditable infrastructure changes</td><td>______</td></tr>
+          <tr><td>Agentic workflows with tool calling &amp; guardrails</td><td>______</td></tr>
+        </tbody>
+      </table>
+      <div class="ans">
+        <button class="ans-btn">Show model answer ▸</button>
+        <div class="ans-body">
+          <table>
+            <thead><tr><th>JD line</th><th>Bucket → reframe</th></tr></thead>
+            <tbody>
+              <tr><td>AKS + Helm deploys</td><td><strong>Have</strong> → "I run production Kubernetes and package releases with Helm today; ML workloads are containers with a model artifact instead of an app binary."</td></tr>
+              <tr><td>Drift / latency / health monitoring</td><td><strong>Have</strong> → "I operate observability with Splunk/Dynatrace using golden signals; model monitoring adds drift and prediction-quality as new signals on the same discipline."</td></tr>
+              <tr><td>RAG with Azure OpenAI</td><td><strong>Build</strong> → net-new (Days 141–162). No reframe — this is genuine study.</td></tr>
+              <tr><td>Anomaly detection</td><td><strong>Bridge</strong> → "My alerting work is rule-based anomaly detection; I'm learning the statistical/ML versions (Isolation Forest, LOF) on Day 73."</td></tr>
+              <tr><td>Auditable infra changes</td><td><strong>Have</strong> → "I manage infra as code with review-gated changes — exactly what I did in today's Terraform lab."</td></tr>
+              <tr><td>Agentic workflows</td><td><strong>Build</strong> → net-new (Days 163–174). Honest gap.</td></tr>
+            </tbody>
+          </table>
+          <div class="call">
+            <span class="k">Keep this</span>
+            Save your completed worksheet in the repo as <code>docs/jd-gap-map.md</code>. It becomes the backbone of your resume rewrite (Day 179) and your answer to "why you?" in interviews.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="call warn">
+      <span class="k">Before you close the laptop</span>
+      Idle cost is near zero, but SRE hygiene says tear down what you're not using: <code>terraform destroy</code> (type <code>yes</code>). You'll re-apply in seconds when Phase 4 needs it. Keep the <code>.tf</code> files — the code is the asset, not the running resources.
+    </div>
+  </section>
+
+  <!-- ===================== REFERENCE ===================== -->
+  <section class="panel" id="ref">
+    <h2>JD → your-skills cheat map</h2>
+    <table>
+      <thead><tr><th>JD requirement</th><th>Bucket</th><th>Where in the 182 days</th></tr></thead>
+      <tbody>
+        <tr><td>Production at scale, reliability</td><td>Have</td><td>Reframe (Day 179)</td></tr>
+        <tr><td>Docker · AKS · Helm · CI/CD</td><td>Have</td><td>Apply to ML (Days 103–120)</td></tr>
+        <tr><td>Monitoring, drift, latency, health</td><td>Have/Bridge</td><td>Days 113–114, 137, 157</td></tr>
+        <tr><td>RBAC · Key Vault · auditability</td><td>Have</td><td>Today + Days 117, 138</td></tr>
+        <tr><td>scikit-learn, classic ML</td><td>Build</td><td>Days 51–80</td></tr>
+        <tr><td>PyTorch / TensorFlow, SHAP</td><td>Build</td><td>Days 81–102, 77</td></tr>
+        <tr><td>Azure ML · MLflow · Databricks</td><td>Build</td><td>Days 121–140</td></tr>
+        <tr><td>Azure OpenAI · embeddings · RAG</td><td>Build</td><td>Days 141–162</td></tr>
+        <tr><td>LangChain · LangGraph · MCP</td><td>Build</td><td>Days 163–174</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Terraform command reference</h2>
+    <table>
+      <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>terraform init</code></td><td>Download providers, set up the working dir. Run once per new config / provider change.</td></tr>
+        <tr><td><code>terraform fmt</code></td><td>Auto-format <code>.tf</code> files to canonical style.</td></tr>
+        <tr><td><code>terraform validate</code></td><td>Static/syntax validation without touching cloud.</td></tr>
+        <tr><td><code>terraform plan</code></td><td>Dry run — shows the diff between desired and real state. Always read this.</td></tr>
+        <tr><td><code>terraform apply</code></td><td>Make reality match the config (asks for confirmation).</td></tr>
+        <tr><td><code>terraform destroy</code></td><td>Tear down everything in state.</td></tr>
+        <tr><td><code>terraform state list</code></td><td>List resources Terraform is tracking.</td></tr>
+        <tr><td><code>terraform output</code></td><td>Print declared outputs.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Azure CLI essentials</h2>
+    <div class="code"><div class="codebar"><span class="fname">az cheatsheet</span><button class="copy">copy</button></div>
+    <pre><code>az login                                   <span class="cmt"># authenticate</span>
+az account show --query id -o tsv          <span class="cmt"># current subscription id</span>
+az account list -o table                   <span class="cmt"># all subscriptions</span>
+az account set --subscription "&lt;id&gt;"       <span class="cmt"># switch active sub</span>
+az group list -o table                     <span class="cmt"># resource groups</span>
+az keyvault secret show --vault-name &lt;kv&gt; --name &lt;n&gt;</code></pre></div>
+
+    <h2>Cost &amp; naming notes</h2>
+    <ul>
+      <li><strong>Resource Group:</strong> free. Storage (LRS, idle): a few paise/day. Key Vault (standard): free tier of operations covers all learning use.</li>
+      <li><strong>Storage account name:</strong> 3–24 chars, lowercase letters + digits only, globally unique.</li>
+      <li><strong>Key Vault name:</strong> 3–24 chars, alphanumeric + hyphens, globally unique, can't start with a digit.</li>
+      <li><strong>Region:</strong> <code>centralindia</code> keeps latency low from Hyderabad; some AI services are region-limited — you'll pick per-service later.</li>
+    </ul>
+
+    <h2>Glossary (just enough for today)</h2>
+    <table>
+      <tbody>
+        <tr><td>MLOps</td><td>DevOps/SRE practices applied to the ML lifecycle — the JD's core focus.</td></tr>
+        <tr><td>Data drift</td><td>Input feature distributions shift over time vs. training data.</td></tr>
+        <tr><td>Model drift</td><td>The learned relationship between inputs and target degrades; accuracy falls.</td></tr>
+        <tr><td>RAG</td><td>Retrieval-Augmented Generation — ground an LLM's answers in retrieved documents.</td></tr>
+        <tr><td>Agent</td><td>An LLM that plans multi-step actions and calls tools, with guardrails.</td></tr>
+        <tr><td>IaC</td><td>Infrastructure as Code — declare infra in files (Terraform), review &amp; version it.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===================== Q&A ===================== -->
+  <section class="panel" id="qa">
+    <p class="lead">Scenario and interview-style questions — the kind you'll actually face for this role. Think through your answer before expanding.</p>
+
+    <details class="qa"><summary>You've been an SRE, not an ML engineer. Why should we consider you for a <em>Senior</em> AI/ML Engineer role?<span class="qtag">positioning</span></summary>
+      <div class="a"><strong>Lead with the shape of the role, not an apology.</strong> A senior AI/ML role that emphasizes MLOps, scalability, reliability, security, and governance is 50–60% production engineering — and that's my day job: I run systems at scale, own CI/CD, Kubernetes, observability, and secrets management. I've closed the modeling gap deliberately — here are the projects (classification, anomaly detection, a RAG app, an agent). So you get someone who won't just train a model in a notebook but can operate it reliably in production from day one, which is where most ML projects actually fail. Be honest about the newer areas; pair every gap with evidence you've built toward it.</div>
+    </details>
+
+    <details class="qa"><summary>The JD wants "reviewable and auditable infrastructure changes." Design that for an ML platform.<span class="qtag">system design</span></summary>
+      <div class="a">Everything as code in Terraform (or Bicep), stored in Git. Changes flow through <strong>pull requests</strong> with required reviewers; CI runs <code>terraform plan</code> and posts the diff on the PR so reviewers see exactly what will change; merge triggers <code>apply</code>. State lives in a <strong>remote backend</strong> (Azure Storage) with locking and encryption. Add <strong>policy-as-code</strong> (OPA/Sentinel) to block, say, public storage or untagged resources. K8s workloads are templated with <strong>Helm</strong> for reproducible, reviewable deploys. Every resource is <strong>tagged</strong> for ownership/cost, and Azure Activity Logs give the audit trail. This is the same governance you already apply to app infra — models are just another artifact in the pipeline.</div>
+    </details>
+
+    <details class="qa"><summary>How does your observability background translate to ML model monitoring?<span class="qtag">translation</span></summary>
+      <div class="a">The four golden signals map almost directly: <strong>latency</strong> → inference/response latency; <strong>traffic</strong> → request volume; <strong>errors</strong> → failed or timed-out predictions; <strong>saturation</strong> → GPU/CPU/memory on the serving fleet. ML then adds signals classic apps don't have: <strong>data drift</strong> (are inputs still shaped like training data?), <strong>model drift / quality</strong> (is accuracy holding against ground truth?), and for GenAI, <strong>groundedness and hallucination rate</strong>. I'd wire these into the same dashboards and alerting discipline I use now, and express targets as SLOs with error budgets — e.g., "p95 prediction latency &lt; 200ms" and "weekly accuracy ≥ threshold."</div>
+    </details>
+
+    <details class="qa"><summary>Explain the difference between data drift and model drift, and how you'd detect each.<span class="qtag">concept</span></summary>
+      <div class="a"><strong>Data drift</strong> is a shift in the <em>input</em> distribution — the features coming in no longer look like training data (new user behavior, a changed upstream source). Detect it by comparing live feature distributions to a training baseline with statistical tests (KS test, Population Stability Index). It needs no labels, so you catch it early. <strong>Model (concept) drift</strong> is when the <em>relationship</em> between inputs and the target changes, so the model's learned mapping is stale and accuracy drops even if inputs look normal. Detect it by tracking live performance against actual outcomes once labels arrive — which is delayed, so data-drift alarms are your leading indicator and performance metrics are the confirming one.</div>
+    </details>
+
+    <details class="qa"><summary>Scenario: <code>terraform apply</code> fails with a 401 / "could not acquire access token." Walk me through debugging it.<span class="qtag">debugging</span></summary>
+      <div class="a">Work from auth outward. <strong>1)</strong> Am I logged in and pointed at the right subscription? <code>az account show</code> — confirm the ID matches <code>TF_VAR_subscription_id</code>. <strong>2)</strong> Is the token stale? Force a refresh with <code>az account get-access-token</code> or re-run <code>az login</code>. <strong>3)</strong> Are conflicting <code>ARM_*</code> env vars (e.g. leftover service-principal creds) overriding my CLI login? <code>env | grep ARM_</code> and unset if so. <strong>4)</strong> On azurerm v4, is <code>subscription_id</code> actually set in the provider or via the env var? <strong>5)</strong> Rarely, clock skew on the machine invalidates the token — check system time. The discipline is the same as any prod auth issue: identify the identity, its scope, and the token's validity, in that order.</div>
+    </details>
+
+    <details class="qa"><summary>Error-fix: re-running <code>apply</code> after a destroy throws "A resource with this ID already exists — must be imported." What happened and how do you resolve it?<span class="qtag">error-fix</span></summary>
+      <div class="a">Terraform's state and reality have diverged: the resource exists in Azure but isn't in Terraform's state — commonly a <strong>soft-deleted Key Vault</strong> whose globally-unique name is still reserved, or a resource created out-of-band. Three resolutions: <strong>(a)</strong> bring it under management with <code>terraform import &lt;address&gt; &lt;azure-id&gt;</code>; <strong>(b)</strong> if it's a soft-deleted vault you don't want, purge it (<code>az keyvault purge --name &lt;name&gt;</code>) then re-apply; or <strong>(c)</strong> change the name (bump the <code>prefix</code> or random suffix) so Terraform creates a fresh one. The root lesson: state is Terraform's source of truth, and drift between state and reality is what you're reconciling.</div>
+    </details>
+  </section>
+
+  <!-- ===================== PROGRESS ===================== -->
+  <section class="panel" id="prog">
+    <h2>Day 1 checklist</h2>
+    <div class="pbar"><i id="pfill"></i></div>
+    <div id="checks">
+      <label class="chk"><input type="checkbox" data-c="1"><span>Verified toolchain (python, terraform, az, git)</span></label>
+      <label class="chk"><input type="checkbox" data-c="2"><span>Bootstrapped the <code>ai-ml-182day</code> repo with venv + .gitignore</span></label>
+      <label class="chk"><input type="checkbox" data-c="3"><span>Provisioned RG + Storage + Key Vault with Terraform (apply succeeded)</span></label>
+      <label class="chk"><input type="checkbox" data-c="4"><span>Stored and read back a Key Vault secret as code</span></label>
+      <label class="chk"><input type="checkbox" data-c="5"><span>Completed the gap-map worksheet, saved to <code>docs/jd-gap-map.md</code></span></label>
+      <label class="chk"><input type="checkbox" data-c="6"><span>Ran <code>terraform destroy</code> to tear down (kept the .tf files)</span></label>
+      <label class="chk"><input type="checkbox" data-c="7"><span>Read all six Q&amp;A answers</span></label>
+    </div>
+
+    <div class="say">
+      <strong>What you can now say in an interview:</strong>
+      <ul>
+        <li>"I've provisioned Azure resources with Terraform — Resource Group, Storage, and Key Vault — using RBAC-based access and IaC review discipline."</li>
+        <li>"I can articulate exactly which parts of an ML platform reuse my SRE strengths and which are genuinely new."</li>
+        <li>"I understand the difference between data drift and model drift and how each is detected."</li>
+      </ul>
+    </div>
+
+    <a class="nextbtn" href="#" onclick="return false;">Next → Day 02: ML lifecycle mapped to your SRE lifecycle + Git portfolio workflow</a>
+  </section>
+
+</div>
+
+<script>
+  // Tabs
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    panels.forEach(p => p.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.tab).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }));
+
+  // Answer reveals
+  document.querySelectorAll('.ans-btn').forEach(b => {
+    if(b.textContent.includes('model')) b.dataset.model = '1';
+  });
+  document.querySelectorAll('.ans-btn').forEach(b => b.addEventListener('click', () => {
+    const body = b.nextElementSibling;
+    const open = body.classList.toggle('open');
+    if(open){ b.textContent = 'Hide answer ▾'; }
+    else { b.textContent = b.dataset.model ? 'Show model answer ▸' : 'Show answer ▸'; }
+  }));
+
+  // Copy buttons (works over file:// too, with fallback)
+  function fallbackCopy(text, ok, no){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed'; ta.style.top = '-9999px';
+    document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, text.length);
+    let done = false;
+    try { done = document.execCommand('copy'); } catch(e){ done = false; }
+    document.body.removeChild(ta);
+    done ? ok() : no();
+  }
+  document.querySelectorAll('.copy').forEach(btn => btn.addEventListener('click', () => {
+    const code = btn.closest('.code').querySelector('code');
+    const text = code.innerText;
+    const ok = () => { btn.textContent = 'copied ✓'; setTimeout(() => btn.textContent = 'copy', 1200); };
+    const no = () => { btn.textContent = 'Ctrl/⌘+C'; setTimeout(() => btn.textContent = 'copy', 1600); };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok, no));
+    } else {
+      fallbackCopy(text, ok, no);
+    }
+  }));
+
+  // Progress (localStorage)
+  const KEY = 'day01_alignment_progress';
+  let state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ state = {}; }
+  const boxes = document.querySelectorAll('#checks input');
+  function refresh(){
+    const done = Object.values(state).filter(Boolean).length;
+    document.getElementById('pfill').style.width = (done/boxes.length*100) + '%';
+  }
+  boxes.forEach(cb => {
+    const id = cb.dataset.c;
+    cb.checked = !!state[id];
+    cb.closest('.chk').classList.toggle('done', cb.checked);
+    cb.addEventListener('change', () => {
+      state[id] = cb.checked;
+      localStorage.setItem(KEY, JSON.stringify(state));
+      cb.closest('.chk').classList.toggle('done', cb.checked);
+      refresh();
+    });
+  });
+  refresh();
+</script>
+</body>
+</html>
