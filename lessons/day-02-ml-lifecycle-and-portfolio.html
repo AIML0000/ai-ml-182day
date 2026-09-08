@@ -208,34 +208,25 @@
     <!-- Lab 1 -->
     <div class="lab">
       <div class="lab-h"><span class="lab-n">LAB 1</span><h3>Scaffold and push the portfolio repo</h3><span class="pill core">Core</span></div>
-      <p class="task">Give the repo a structure a reviewer can navigate, then push it to GitHub as a private repo. Work on a branch, not <code>main</code> — you're rehearsing the review-gated workflow the JD wants.</p>
+      <p class="task">The track already ships a reviewer-friendly structure; here you add your working folders (notebooks, src, projects, docs) and push to GitHub. Work on a branch, not <code>main</code> — you're rehearsing the review-gated workflow the JD wants.</p>
       <div class="code"><div class="codebar"><span class="fname">scaffold.sh</span><button class="copy">copy</button></div>
-      <pre><code>cd ai-ml-182day
+      <pre><code>cd ai-ml-182day-track
 git checkout -b day-02-setup
 
-mkdir -p infra notebooks src projects docs
+<span class="cmt"># the track already ships README.md, roadmap/, lessons/, infra/foundation/, scripts/</span>
+<span class="cmt"># add only the working folders you'll grow into (don't recreate or overwrite what exists):</span>
+mkdir -p notebooks src projects docs
 mkdir -p projects/01-eda-report projects/02-classifier
-
-cat > README.md &lt;&lt;'MD'
-# AI/ML Engineer — 182-Day Portfolio
-Learning + projects for a Senior AI/ML Engineer (Azure) transition.
-
-## Layout
-- infra/      Terraform (IaC) for the Azure foundation
-- notebooks/  exploration
-- src/        reusable Python modules
-- projects/   the ten portfolio projects
-- docs/       gap-map, notes, diagrams
-MD
+touch notebooks/.gitkeep src/.gitkeep docs/.gitkeep   <span class="cmt"># track empty dirs</span>
 
 git add .
-git commit -m "chore: scaffold repo structure + README"</code></pre></div>
+git commit -m "chore: add working folders (notebooks, src, projects, docs)"</code></pre></div>
       <div class="code"><div class="codebar"><span class="fname">push to GitHub</span><button class="copy">copy</button></div>
       <pre><code><span class="cmt"># with GitHub CLI (easiest):</span>
 gh repo create AIML0000/ai-ml-182day --private --source=. --push
 
 <span class="cmt"># OR manual: create empty repo on github.com, then:</span>
-git remote add origin git@github.com:AIML0000/ai-ml-182day.git
+git remote add origin https://github.com/AIML0000/ai-ml-182day.git
 git push -u origin day-02-setup</code></pre></div>
       <div class="ans">
         <button class="ans-btn">Show answer ▸</button>
@@ -286,8 +277,8 @@ az storage container list --account-name $SA -o table   <span class="cmt"># tfst
     <!-- Lab 3 -->
     <div class="lab">
       <div class="lab-h"><span class="lab-n">LAB 3</span><h3>Migrate Terraform state to the backend</h3><span class="pill tf">Terraform</span></div>
-      <p class="task">Point your Day-1 <code>infra/</code> config at the remote backend and migrate the existing local state into it. Add the backend block, then re-init.</p>
-      <div class="code"><div class="codebar"><span class="fname">infra/backend.tf</span><button class="copy">copy</button></div>
+      <p class="task">Point your Day-1 <code>infra/foundation/</code> config at the remote backend and migrate the existing local state into it. Add the backend block, then re-init.</p>
+      <div class="code"><div class="codebar"><span class="fname">infra/foundation/backend.tf</span><button class="copy">copy</button></div>
       <pre><code>terraform {
   backend "azurerm" {
     resource_group_name  = "tfstate-rg"
@@ -297,7 +288,7 @@ az storage container list --account-name $SA -o table   <span class="cmt"># tfst
   }
 }</code></pre></div>
       <div class="code"><div class="codebar"><span class="fname">migrate</span><button class="copy">copy</button></div>
-      <pre><code>cd infra
+      <pre><code>cd infra/foundation
 terraform init -migrate-state     <span class="cmt"># prompts to copy local state to Azure -> yes</span>
 terraform plan                    <span class="cmt"># should show: No changes.</span></code></pre></div>
       <div class="ans">
@@ -357,31 +348,32 @@ No changes. Your infrastructure matches the configuration.</code></pre></div>
 
     <div class="call warn">
       <span class="k">Wrap-up</span>
-      Commit the new <code>infra/backend.tf</code> (safe — it holds names, not secrets) and open a PR from <code>day-02-setup</code> to <code>main</code>. Leave the backend storage running; it's near-free and holds your state. You can still <code>terraform destroy</code> the app foundation any time — its state stays safe in Azure.
+      Commit the new <code>infra/foundation/backend.tf</code> (safe — it holds names, not secrets) and open a PR from <code>day-02-setup</code> to <code>main</code>. Leave the backend storage running; it's near-free and holds your state. You can still <code>terraform destroy</code> the app foundation any time — its state stays safe in Azure.
     </div>
   </section>
 
   <!-- REFERENCE -->
   <section class="panel" id="ref">
     <h2>Recommended repo structure</h2>
-    <div class="code"><div class="codebar"><span class="fname">ai-ml-182day/</span><button class="copy">copy</button></div>
-    <pre><code>ai-ml-182day/
-├── README.md
+    <div class="code"><div class="codebar"><span class="fname">ai-ml-182day-track/</span><button class="copy">copy</button></div>
+    <pre><code>ai-ml-182day-track/
+├── README.md              <span class="cmt"># track index (shipped)</span>
 ├── requirements.txt
 ├── .gitignore
-├── infra/                 <span class="cmt"># Terraform (IaC)</span>
-│   ├── versions.tf
-│   ├── variables.tf
-│   ├── main.tf
-│   ├── outputs.tf
-│   └── backend.tf
-├── notebooks/             <span class="cmt"># exploration, EDA</span>
-├── src/                   <span class="cmt"># reusable python modules</span>
+├── roadmap/               <span class="cmt"># the 182-day plan (shipped)</span>
+├── lessons/               <span class="cmt"># daily lesson files (shipped)</span>
+├── infra/
+│   └── foundation/        <span class="cmt"># Day 1 Terraform (shipped)</span>
+│       ├── versions.tf  variables.tf  main.tf
+│       └── budget.tf  outputs.tf  backend.tf
+├── scripts/               <span class="cmt"># azure-login.sh (shipped)</span>
+├── notebooks/             <span class="cmt"># exploration, EDA (you add)</span>
+├── src/                   <span class="cmt"># reusable python modules (you add)</span>
 ├── projects/
 │   ├── 01-eda-report/
 │   ├── 02-classifier/
 │   └── ...                <span class="cmt"># ten portfolio projects</span>
-└── docs/                  <span class="cmt"># jd-gap-map.md, lifecycle notes, diagrams</span></code></pre></div>
+└── docs/                  <span class="cmt"># jd-gap-map.md, notes (you add)</span></code></pre></div>
 
     <h2>Git workflow (review-gated)</h2>
     <table>
