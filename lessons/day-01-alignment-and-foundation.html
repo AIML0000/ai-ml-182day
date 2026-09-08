@@ -278,10 +278,10 @@ az login   <span class="cmt"># opens a browser; pick your PAYG subscription</spa
     <!-- Lab 1 -->
     <div class="lab">
       <div class="lab-h"><span class="lab-n">LAB 1</span><h3>Bootstrap the portfolio repo</h3><span class="pill core">Core</span></div>
-      <p class="task">Create the repo you'll grow across the track: an isolated Python virtual environment, the core ML libraries, a sane <code>.gitignore</code> (never commit state files or secrets), and a first commit.</p>
+      <p class="task">Set up the repo — the track unzips to <code>ai-ml-182day-track/</code>, so work inside that folder: an isolated Python virtual environment, the core ML libraries, a sane <code>.gitignore</code> (never commit state files or secrets), and a first commit.</p>
       <div class="code"><div class="codebar"><span class="fname">bootstrap.sh</span><button class="copy">copy</button></div>
-      <pre><code>mkdir ai-ml-182day
-cd ai-ml-182day
+      <pre><code><span class="cmt"># the track unzips to ai-ml-182day-track/ — work inside it</span>
+cd ai-ml-182day-track
 
 python3 -m venv .venv
 source .venv/bin/activate        <span class="cmt"># Windows: .venv\Scripts\activate</span>
@@ -289,10 +289,10 @@ python -m pip install --upgrade pip
 pip install numpy pandas scikit-learn jupyter
 pip freeze > requirements.txt
 
-git init
-printf '.venv/\n__pycache__/\n*.pyc\n.terraform/\n*.tfstate*\nterraform.tfvars\n.env\n' > .gitignore
+git init                         <span class="cmt"># if it isn't a repo yet</span>
+<span class="cmt"># .gitignore already ships in the track — confirm it lists .venv/, *.tfstate*, .env</span>
 git add .
-git commit -m "chore: bootstrap ai-ml portfolio"</code></pre></div>
+git commit -m "chore: bootstrap ai-ml-182day track"</code></pre></div>
       <div class="ans">
         <button class="ans-btn">Show answer ▸</button>
         <div class="ans-body">
@@ -309,9 +309,9 @@ git status --ignored  <span class="cmt"># .venv/ etc. listed as ignored, not sta
     <!-- Lab 2 -->
     <div class="lab">
       <div class="lab-h"><span class="lab-n">LAB 2</span><h3>Provision the Azure foundation with Terraform</h3><span class="pill tf">Terraform</span></div>
-      <p class="task">Declare a Resource Group + Storage Account + Key Vault as code. This is the shared foundation the Azure ML labs (Days 121–140) will build on. Create the four files below in an <code>infra/</code> folder inside your repo, then run the workflow.</p>
+      <p class="task">Declare a Resource Group + Storage Account + Key Vault as code. This is the shared foundation the Azure ML labs (Days 121–140) will build on. These files ship in <code>infra/foundation/</code> — review each below (understanding the HCL is the point), then run the workflow from that folder.</p>
 
-      <div class="code"><div class="codebar"><span class="fname">infra/versions.tf</span><button class="copy">copy</button></div>
+      <div class="code"><div class="codebar"><span class="fname">infra/foundation/versions.tf</span><button class="copy">copy</button></div>
       <pre><code>terraform {
   required_version = ">= 1.6"
   required_providers {
@@ -325,7 +325,7 @@ provider "azurerm" {
   subscription_id = var.subscription_id   <span class="cmt"># required in azurerm v4</span>
 }</code></pre></div>
 
-      <div class="code"><div class="codebar"><span class="fname">infra/variables.tf</span><button class="copy">copy</button></div>
+      <div class="code"><div class="codebar"><span class="fname">infra/foundation/variables.tf</span><button class="copy">copy</button></div>
       <pre><code>variable "subscription_id" {
   type        = string
   description = "Your Azure subscription ID"
@@ -339,7 +339,7 @@ variable "prefix" {
   default = "mllab"
 }</code></pre></div>
 
-      <div class="code"><div class="codebar"><span class="fname">infra/main.tf</span><button class="copy">copy</button></div>
+      <div class="code"><div class="codebar"><span class="fname">infra/foundation/main.tf</span><button class="copy">copy</button></div>
       <pre><code>resource "random_string" "suffix" {
   length  = 6
   special = false
@@ -381,15 +381,14 @@ resource "azurerm_role_assignment" "kv_secrets" {
   principal_id         = data.azurerm_client_config.current.object_id
 }</code></pre></div>
 
-      <div class="code"><div class="codebar"><span class="fname">infra/outputs.tf</span><button class="copy">copy</button></div>
+      <div class="code"><div class="codebar"><span class="fname">infra/foundation/outputs.tf</span><button class="copy">copy</button></div>
       <pre><code>output "resource_group"  { value = azurerm_resource_group.ml.name }
 output "storage_account" { value = azurerm_storage_account.ml.name }
 output "key_vault_uri"   { value = azurerm_key_vault.ml.vault_uri }</code></pre></div>
 
       <div class="code"><div class="codebar"><span class="fname">run the workflow</span><button class="copy">copy</button></div>
-      <pre><code>cd infra
-az login                                     <span class="cmt"># if not already</span>
-export TF_VAR_subscription_id=$(az account show --query id -o tsv)
+      <pre><code>cd infra/foundation
+source ../../scripts/azure-login.sh          <span class="cmt"># az login + export TF_VAR_subscription_id</span>
 
 terraform init      <span class="cmt"># downloads providers</span>
 terraform fmt       <span class="cmt"># auto-format (habit)</span>
@@ -432,8 +431,8 @@ terraform state list   <span class="cmt"># the 5 objects Terraform now manages</
     <!-- Lab 3 -->
     <div class="lab">
       <div class="lab-h"><span class="lab-n">LAB 3</span><h3>Store a secret in Key Vault (as code)</h3><span class="pill tf">Terraform</span></div>
-      <p class="task">The JD calls out "Azure Key Vault and secure ML practices." Add a secret to your vault declaratively — the same mechanism you'll later use for an Azure OpenAI key. Append this to <code>main.tf</code>, then <code>apply</code> again.</p>
-      <div class="code"><div class="codebar"><span class="fname">infra/main.tf (append)</span><button class="copy">copy</button></div>
+      <p class="task">The JD calls out "Azure Key Vault and secure ML practices." Your <code>main.tf</code> already declares this secret (shown below) — the same mechanism you'll later use for an Azure OpenAI key. After <code>apply</code>, verify you can read it back.</p>
+      <div class="code"><div class="codebar"><span class="fname">infra/foundation/main.tf (already included)</span><button class="copy">copy</button></div>
       <pre><code>resource "azurerm_key_vault_secret" "demo" {
   name         = "demo-api-key"
   value        = "placeholder-rotate-me"
@@ -596,7 +595,7 @@ az keyvault secret show --vault-name &lt;kv&gt; --name &lt;n&gt;</code></pre></d
     <div class="pbar"><i id="pfill"></i></div>
     <div id="checks">
       <label class="chk"><input type="checkbox" data-c="1"><span>Verified toolchain (python, terraform, az, git)</span></label>
-      <label class="chk"><input type="checkbox" data-c="2"><span>Bootstrapped the <code>ai-ml-182day</code> repo with venv + .gitignore</span></label>
+      <label class="chk"><input type="checkbox" data-c="2"><span>Set up the <code>ai-ml-182day-track</code> repo (venv + .gitignore) and pushed to AIML0000</span></label>
       <label class="chk"><input type="checkbox" data-c="3"><span>Provisioned RG + Storage + Key Vault with Terraform (apply succeeded)</span></label>
       <label class="chk"><input type="checkbox" data-c="4"><span>Stored and read back a Key Vault secret as code</span></label>
       <label class="chk"><input type="checkbox" data-c="5"><span>Completed the gap-map worksheet, saved to <code>docs/jd-gap-map.md</code></span></label>

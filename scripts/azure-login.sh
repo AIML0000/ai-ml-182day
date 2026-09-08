@@ -10,6 +10,8 @@
 #
 # Sets:  ARM_SUBSCRIPTION_ID
 #        TF_VAR_subscription_id / TF_VAR_location
+# Note: values are CR-stripped (tr -d) so CRLF line endings from Windows
+# editors can't corrupt the subscription id.
 # ---------------------------------------------------------------------------
 
 # refuse to run un-sourced (exports would vanish)
@@ -30,7 +32,7 @@ if ! az account show >/dev/null 2>&1; then
 fi
 
 # show subscriptions and let you pick if there's more than one
-COUNT="$(az account list --query 'length(@)' -o tsv 2>/dev/null)"
+COUNT="$(az account list --query 'length(@)' -o tsv 2>/dev/null | tr -d '\r\n')"
 if [ "${COUNT:-1}" -gt 1 ]; then
   echo "--> multiple subscriptions:"
   az account list --query '[].{name:name, id:id, default:isDefault}' -o table
@@ -38,7 +40,7 @@ if [ "${COUNT:-1}" -gt 1 ]; then
   [ -n "$_sub" ] && az account set --subscription "$_sub"
 fi
 
-SUB="$(az account show --query id -o tsv)"
+SUB="$(az account show --query id -o tsv | tr -d '\r\n')"
 NAME="$(az account show --query name -o tsv)"
 
 export ARM_SUBSCRIPTION_ID="$SUB"
