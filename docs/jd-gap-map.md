@@ -1,0 +1,7 @@
+# JD gap-map (corrected)
+- AKS + Helm deploys ......... HAVE (reframe SRE K8s/Helm)
+- Drift/latency/health mon ... HAVE (golden signals) + small BUILD (drift)
+- RAG w/ Azure OpenAI ........ BUILD (Days 141–162)
+- Anomaly detection .......... BRIDGE (alerting -> Isolation Forest/LOF, Day 73)
+- Auditable infra changes .... HAVE (Terraform, done Day 1)
+- Agentic workflows .......... BUILD (Days 163–174)
