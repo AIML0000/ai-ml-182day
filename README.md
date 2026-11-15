@@ -46,7 +46,8 @@ ai-ml-182day-track/
 | Roadmap (11 phases, 182 days) | delivered |
 | Day 01 — Alignment & Foundation | delivered |
 | Day 02 — ML Lifecycle & Portfolio Workflow | delivered |
-| Day 03 — Python: data structures | not started |
+| Day 03 — Python: data structures | delivered |
+| Day 04 — Comprehensions & idioms | not started |
 
 ## How to run the Azure labs (personal account)
 

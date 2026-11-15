@@ -90,6 +90,14 @@
     body{color:#000}
     a{color:#000}
   }
+
+  .dnum-link{color:var(--teal);text-decoration:none;border-bottom:1px solid transparent;}
+  .dnum-link:hover{border-bottom-color:var(--teal);}
+  .open-lsn{margin-left:8px;font-family:"SF Mono",monospace;font-size:10px;letter-spacing:.04em;
+    color:var(--teal);text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:1px 6px;
+    white-space:nowrap;vertical-align:middle;}
+  .open-lsn:hover{border-color:var(--teal);background:var(--teal-soft);}
+  @media print{.open-lsn{display:none}}
 </style>
 </head>
 <body>
@@ -351,6 +359,14 @@ const PLAN = [
   ]},
 ];
 
+
+// Lessons that have been built -> their files (relative to roadmap/).
+// Add a line here as each day's lesson ships; that day becomes a link.
+const LESSONS = {
+  1: "../lessons/day-01-alignment-and-foundation.html",
+  2: "../lessons/day-02-ml-lifecycle-and-portfolio.html",
+  3: "../lessons/day-03-python-data-structures.html",
+};
 const KEY = "aiml182_progress_v1";
 const TOTAL = 182;
 let done = {};
@@ -382,10 +398,18 @@ PLAN.forEach((p, pi) => {
     let tags = "";
     if (tag === "port") tags += `<span class="tag port">◆ Portfolio</span>`;
     if (strength) tags += `<span class="tag str">▲ Your strength</span>`;
+    const href = LESSONS[n];
+    const dayLabel = `Day ${String(n).padStart(3," ")}`;
+    const dnum = href
+      ? `<a class="dnum dnum-link" href="${href}" target="_blank" rel="noopener" title="Open ${dayLabel} lesson">${dayLabel}</a>`
+      : `<span class="dnum">${dayLabel}</span>`;
+    const openTag = href ? `<a class="open-lsn" href="${href}" target="_blank" rel="noopener" title="Open lesson">open ↗</a>` : "";
     row.innerHTML = `
       <input type="checkbox" ${done[n] ? "checked":""}>
-      <span class="dnum">Day ${String(n).padStart(3," ")}</span>
-      <span class="dtxt">${text}${tags}</span>`;
+      ${dnum}
+      <span class="dtxt">${text}${tags}${openTag}</span>`;
+    row.querySelectorAll("a.dnum-link, a.open-lsn").forEach(a =>
+      a.addEventListener("click", ev => ev.stopPropagation()));
     row.querySelector("input").addEventListener("change", e => {
       if (e.target.checked) done[n] = 1; else delete done[n];
       localStorage.setItem(KEY, JSON.stringify(done));

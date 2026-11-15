@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 03 — Python Data Structures</title>
+<style>
+  :root{
+    --bg:#ffffff; --paper:#fafbfc; --line:#e4e8ee; --line-2:#eef1f5;
+    --ink:#111927; --body:#374151; --muted:#6b7280; --dim:#9aa4b2;
+    --teal:#0f766e; --teal-soft:#e6f4f2;
+    --indigo:#4338ca; --amber:#b45309; --violet:#7c3aed; --rose:#be123c;
+    --code-bg:#f6f8fa; --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--body);font-size:15px;line-height:1.6;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 56px}
+  code,pre,.mono{font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace}
+  p code,td code,li code,.a code,summary code{background:var(--code-bg);border:1px solid var(--line);
+    padding:1px 5px;border-radius:5px;font-size:.88em;color:#0b3b37}
+  a{color:var(--teal)}
+
+  header{border:1px solid var(--line);border-top:3px solid var(--teal);border-radius:var(--radius);
+    padding:22px 24px;background:var(--paper)}
+  .eyebrow{font-family:"SF Mono",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--teal);margin:0 0 10px}
+  .daybadge{display:inline-block;font-family:"SF Mono",monospace;font-weight:700;font-size:12px;
+    background:var(--teal);color:#fff;padding:3px 9px;border-radius:6px;margin-right:10px}
+  h1{margin:4px 0 8px;font-size:26px;line-height:1.2;letter-spacing:-.4px;color:var(--ink)}
+  .obj{color:var(--muted);margin:0;max-width:730px}
+  .hmeta{margin-top:14px;display:flex;gap:20px;flex-wrap:wrap;font-family:"SF Mono",monospace;
+    font-size:11.5px;color:var(--dim)}
+  .hmeta b{color:var(--body);font-weight:600}
+
+  nav.tabs{display:flex;gap:2px;margin:22px 0 0;border-bottom:2px solid var(--line);flex-wrap:wrap}
+  .tab{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;font-weight:600;
+    padding:11px 16px;border-bottom:2px solid transparent;font-family:inherit;position:relative;bottom:-2px}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+  .panel{display:none;padding-top:26px}
+  .panel.active{display:block}
+
+  h2{font-size:19px;margin:30px 0 12px;letter-spacing:-.2px;color:var(--ink)}
+  h2:first-child{margin-top:0}
+  h3{font-size:15px;margin:22px 0 8px;color:var(--ink)}
+  p{margin:10px 0}
+  .lead{color:var(--muted)}
+
+  .call{border:1px solid var(--line);border-left:3px solid var(--teal);background:var(--bg);
+    padding:12px 16px;border-radius:8px;margin:16px 0}
+  .call.amber{border-left-color:var(--amber)} .call.warn{border-left-color:var(--rose)}
+  .call .k{font-family:"SF Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--teal);display:block;margin-bottom:4px}
+  .call.amber .k{color:var(--amber)} .call.warn .k{color:var(--rose)}
+
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{color:var(--teal);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+    border-bottom:2px solid var(--line)}
+  td:first-child{color:var(--ink);font-weight:500}
+  tbody tr:hover{background:var(--paper)}
+
+  .code{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:14px 0;background:var(--code-bg)}
+  .codebar{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;
+    background:#eef1f5;border-bottom:1px solid var(--line)}
+  .codebar .fname{font-family:"SF Mono",monospace;font-size:11.5px;color:var(--muted)}
+  .copy{background:#fff;border:1px solid var(--line);color:var(--muted);cursor:pointer;font-size:10.5px;
+    padding:3px 9px;border-radius:6px;font-family:"SF Mono",monospace}
+  .copy:hover{color:var(--teal);border-color:var(--teal)}
+  pre{margin:0;padding:13px 16px;overflow-x:auto;font-size:13px;line-height:1.6}
+  pre code{color:#0f2e2a;white-space:pre}
+  .cmt{color:#8a94a2}
+  .out{color:#7c3aed}
+
+  .lab{border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:20px 0;background:var(--paper)}
+  .lab-h{display:flex;align-items:center;gap:10px;margin:0 0 6px;flex-wrap:wrap}
+  .lab-n{font-family:"SF Mono",monospace;font-size:11px;background:var(--teal-soft);color:var(--teal);
+    padding:3px 8px;border-radius:6px;font-weight:700}
+  .lab-h h3{margin:0}
+  .pill{font-family:"SF Mono",monospace;font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;margin-left:auto}
+  .pill.py{color:var(--indigo);border:1px solid #d2d4f2}
+  .pill.proj{color:var(--amber);border:1px solid #f0dcc0}
+  .task{color:var(--body)}
+  .ans{margin-top:12px}
+  .ans-btn{background:#fff;border:1px dashed var(--teal);color:var(--teal);cursor:pointer;
+    font-size:12.5px;padding:8px 14px;border-radius:8px;font-family:inherit;font-weight:600}
+  .ans-btn:hover{background:var(--teal-soft)}
+  .ans-body{display:none;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+  .ans-body.open{display:block}
+  .ans-body h5{margin:14px 0 6px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
+  .ans-body h5:first-child{margin-top:0}
+
+  .qa{border:1px solid var(--line);border-radius:10px;margin:14px 0;overflow:hidden;background:var(--bg)}
+  .qa summary{cursor:pointer;padding:14px 16px;font-weight:600;list-style:none;display:flex;gap:10px;
+    align-items:flex-start;color:var(--ink)}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary::before{content:"Q";font-family:"SF Mono",monospace;color:var(--teal);font-weight:700;flex:none}
+  .qa[open] summary{border-bottom:1px solid var(--line);background:var(--paper)}
+  .qa .a{padding:14px 16px 16px 42px;color:var(--body);font-size:14px}
+  .qa .a strong{color:var(--ink)}
+  .qtag{font-family:"SF Mono",monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;
+    margin-left:auto;padding:2px 7px;border-radius:5px;color:var(--dim);border:1px solid var(--line);flex:none}
+
+  .chk{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line-2)}
+  .chk input{appearance:none;-webkit-appearance:none;width:19px;height:19px;border:1.5px solid var(--dim);
+    border-radius:6px;background:#fff;cursor:pointer;flex:none;margin-top:2px;position:relative}
+  .chk input:checked{background:var(--teal);border-color:var(--teal)}
+  .chk input:checked::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;color:#fff;font-size:12px;font-weight:800}
+  .chk.done span{color:var(--dim);text-decoration:line-through}
+  .pbar{height:8px;background:#eef1f5;border:1px solid var(--line);border-radius:99px;overflow:hidden;margin:8px 0 20px}
+  .pbar i{display:block;height:100%;width:0;background:var(--teal);transition:width .3s}
+  .say{border:1px solid var(--line);border-left:3px solid var(--indigo);border-radius:8px;padding:16px;margin-top:20px}
+  .say li{margin:8px 0;color:var(--body)}
+  .nextbtn{display:inline-block;margin-top:18px;color:var(--teal);border:1px solid var(--teal);
+    padding:10px 16px;border-radius:8px;text-decoration:none;font-size:13.5px}
+
+  @media print{
+    body{font-size:11.5pt;color:#000}
+    .wrap{padding:0;max-width:none}
+    nav.tabs,.copy,.ans-btn,.nextbtn{display:none!important}
+    .panel{display:block!important;padding-top:18px;page-break-before:always}
+    .panel:first-of-type{page-break-before:avoid}
+    .ans-body{display:block!important}
+    .qa .a{display:block!important}
+    header{border:1px solid #000}
+    .code,.lab,.qa,table,.call{page-break-inside:avoid}
+    a{color:#000;text-decoration:none}
+  }
+
+
+  /* top strip: hub link only, right-aligned */
+  .navstrip{display:flex;justify-content:flex-end;margin:16px 0 0;}
+  .navstrip a{font-family:"SF Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--teal);
+    border:1px solid var(--line);border-radius:8px;padding:6px 11px;text-decoration:none;}
+  .navstrip a:hover{border-color:var(--teal);background:var(--teal-soft);}
+  /* bottom day-navigation bar */
+  .daynav{display:flex;align-items:stretch;gap:12px;margin:40px 0 0;padding-top:24px;border-top:1px solid var(--line);}
+  .daynav a,.daynav span.nav-none{flex:1 1 0;display:flex;flex-direction:column;gap:3px;
+    border:1px solid var(--line);border-radius:10px;padding:12px 16px;text-decoration:none;background:var(--bg);min-width:0;}
+  .daynav a:hover{border-color:var(--teal);background:var(--teal-soft);}
+  .daynav .nav-dir{font-family:"SF Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);}
+  .daynav .nav-lbl{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .daynav a.nav-next,.daynav span.nav-none.nav-next{align-items:flex-end;text-align:right;}
+  .daynav a.nav-roadmap .nav-lbl{color:var(--teal);}
+  .daynav .nav-hub{flex:none;justify-content:center;align-items:center;text-align:center;line-height:1.3;
+    font-family:"SF Mono",monospace;font-size:11px;color:var(--teal);}
+  .daynav span.nav-none{opacity:.4;cursor:default;}
+  @media(max-width:560px){.daynav{flex-wrap:wrap}.daynav .nav-hub{order:3;flex:1 1 100%}}
+  @media print{.navstrip,.daynav{display:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">AI/ML Engineer · 182-Day Track · Phase 1</p>
+    <h1><span class="daybadge">DAY 03</span>Python Data Structures</h1>
+    <p class="obj">The four containers every ML dataset, feature map, and label set is built from — <code>list</code>, <code>tuple</code>, <code>dict</code>, <code>set</code>. Picking the right one is a correctness <em>and</em> performance decision, exactly the kind you already make as an SRE. Today: what each is for, when to reach for it, and why <code>dict</code>/<code>set</code> lookups are the fast path.</p>
+    <div class="hmeta">
+      <span><b>Est. time</b> 75–90 min</span>
+      <span><b>Runs in</b> your <code>.venv</code> — no cloud, no cost</span>
+      <span><b>Save to</b> <code>src/</code></span>
+      <span><b>Push</b> AIML0000/ai-ml-182day</span>
+    </div>
+  </header>
+  <div class="navstrip"><a href="../roadmap/ai-ml-engineer-182-day-roadmap.html" title="All days (roadmap)">▦ All days</a></div>
+
+<nav class="tabs">
+    <button class="tab active" data-tab="learn">Learn</button>
+    <button class="tab" data-tab="labs">Labs</button>
+    <button class="tab" data-tab="ref">Reference</button>
+    <button class="tab" data-tab="qa">Q&amp;A</button>
+    <button class="tab" data-tab="prog">Progress</button>
+  </nav>
+
+  <!-- LEARN -->
+  <section class="panel active" id="learn">
+    <h2>Four containers, four jobs</h2>
+    <p class="lead">Python gives you four built-in containers. They differ on three axes — <strong>ordered?</strong>, <strong>mutable?</strong>, <strong>duplicates allowed?</strong> — and that's what decides which one fits. Get this right and your ML code is both correct and fast; get it wrong and you'll write an O(n²) loop where an O(n) one would do.</p>
+
+    <table>
+      <thead><tr><th>Type</th><th>Ordered</th><th>Mutable</th><th>Duplicates</th><th>Reach for it when…</th></tr></thead>
+      <tbody>
+        <tr><td><code>list</code></td><td>yes</td><td>yes</td><td>yes</td><td>an ordered, growable sequence — rows of a dataset, a batch of samples</td></tr>
+        <tr><td><code>tuple</code></td><td>yes</td><td><strong>no</strong></td><td>yes</td><td>a fixed record that shouldn't change — a coordinate, a return value, a dict key</td></tr>
+        <tr><td><code>dict</code></td><td>yes*</td><td>yes</td><td>keys unique</td><td>key→value lookups — feature maps, config, counting, caching</td></tr>
+        <tr><td><code>set</code></td><td>no</td><td>yes</td><td><strong>no</strong></td><td>uniqueness &amp; fast membership — dedupe, label sets, "seen already?"</td></tr>
+      </tbody>
+    </table>
+    <p class="lead">*<code>dict</code> preserves insertion order since Python 3.7 — but you rely on it for iteration order, not for sorting.</p>
+
+    <h2>The performance point (this is the SRE angle)</h2>
+    <p>The single most important thing on this page: <strong>checking membership in a <code>list</code> is O(n)</strong> — Python scans every element — <strong>while a <code>set</code> or <code>dict</code> does it in O(1)</strong> via hashing. If you're filtering a million log lines against a set of known-bad hosts, <code>host in bad_hosts</code> is instant when <code>bad_hosts</code> is a <code>set</code> and painfully slow when it's a <code>list</code>. Same code, 1000× difference at scale.</p>
+    <div class="code"><div class="codebar"><span class="fname">why it matters</span><button class="copy">copy</button></div>
+    <pre><code>known_bad = ["h1", "h2", ..., "h9999"]        <span class="cmt"># list  -> `x in known_bad` scans up to 10k items</span>
+known_bad = {"h1", "h2", ..., "h9999"}        <span class="cmt"># set   -> `x in known_bad` is one hash lookup</span></code></pre>
+
+    <h2>Mutable vs immutable — and why it decides keys</h2>
+    <p>A <code>dict</code> key or a <code>set</code> element must be <strong>hashable</strong>, which in practice means <em>immutable</em>: <code>str</code>, <code>int</code>, <code>tuple</code>, <code>frozenset</code> qualify; <code>list</code>, <code>dict</code>, <code>set</code> do not. The reason is simple — a hash table finds items by a value computed from their contents, so if the contents could change, the item would get "lost" in the table. That's why a <code>tuple</code> can be a dict key (e.g. <code>(region, service)</code>) but a <code>list</code> cannot.</p>
+
+    <div class="call">
+      <span class="k">ML framing</span>
+      A dataset is a <code>list</code> of records; each record is often a <code>dict</code> of feature-name → value; the set of distinct class labels is a <code>set</code>; a fixed <code>(row, col)</code> index or a model's <code>(precision, recall)</code> result is a <code>tuple</code>. You'll use all four before you ever import scikit-learn.
+    </div>
+
+    <div class="call amber">
+      <span class="k">Today's mission</span>
+      Five short labs on realistic SRE-flavored data (pods, hosts, log lines, metrics). Do each, then reveal the worked answer. Save the final mini-project to <code>src/day03_containers.py</code> and commit it.
+    </div>
+  </section>
+
+  <!-- LABS -->
+  <section class="panel" id="labs">
+    <p class="lead">Work in your activated <code>.venv</code>. You can run snippets in a Python REPL (<code>python</code>) or save to a file and run it. Answers show the code and expected output.</p>
+
+    <!-- Lab 1 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 1</span><h3>Lists — a batch of pod restart counts</h3><span class="pill py">Python</span></div>
+      <p class="task">You have restart counts for pods in a deployment. Print how many pods there are, the total restarts, the max, and the list sorted highest-first. Then append a new pod's count and re-check the total.</p>
+      <div class="code"><div class="codebar"><span class="fname">starter</span><button class="copy">copy</button></div>
+      <pre><code>restarts = [0, 2, 0, 7, 1, 0, 3]
+<span class="cmt"># TODO: count, total, max, sorted desc; then append 5 and re-total</span></code></pre></div>
+      <div class="ans">
+        <button class="ans-btn">Show answer ▸</button>
+        <div class="ans-body">
+          <div class="code"><div class="codebar"><span class="fname">solution</span><button class="copy">copy</button></div>
+          <pre><code>restarts = [0, 2, 0, 7, 1, 0, 3]
+
+print(len(restarts))            <span class="out"># 7</span>
+print(sum(restarts))            <span class="out"># 13</span>
+print(max(restarts))            <span class="out"># 7</span>
+print(sorted(restarts, reverse=True))   <span class="out"># [7, 3, 2, 1, 0, 0, 0]</span>
+
+restarts.append(5)
+print(sum(restarts))            <span class="out"># 18</span></code></pre></div>
+          <h5>Notes</h5>
+          <p><code>sorted()</code> returns a <em>new</em> list and leaves the original untouched; <code>restarts.sort()</code> would sort in place and return <code>None</code>. <code>append()</code> mutates the list in place — lists are mutable, which is exactly why they're the right choice for a growing collection.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab 2 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 2</span><h3>Dicts — host → CPU%, and counting log levels</h3><span class="pill py">Python</span></div>
+      <p class="task">Build a dict of <code>host → cpu%</code>. Look up one host, update another, and iterate to print any host above 80%. Then, given a list of log levels, count how many times each level appears — without knowing the levels in advance.</p>
+      <div class="code"><div class="codebar"><span class="fname">starter</span><button class="copy">copy</button></div>
+      <pre><code>cpu = {"web-01": 42, "web-02": 91, "db-01": 66}
+levels = ["INFO", "ERROR", "INFO", "WARN", "ERROR", "INFO"]
+<span class="cmt"># TODO: lookup web-01; set web-03=75; print hosts &gt; 80; count levels</span></code></pre></div>
+      <div class="ans">
+        <button class="ans-btn">Show answer ▸</button>
+        <div class="ans-body">
+          <div class="code"><div class="codebar"><span class="fname">solution</span><button class="copy">copy</button></div>
+          <pre><code>cpu = {"web-01": 42, "web-02": 91, "db-01": 66}
+
+print(cpu["web-01"])            <span class="out"># 42</span>
+cpu["web-03"] = 75             <span class="cmt"># add / update a key</span>
+
+for host, pct in cpu.items():
+    if pct &gt; 80:
+        print(host, pct)        <span class="out"># web-02 91</span>
+
+levels = ["INFO", "ERROR", "INFO", "WARN", "ERROR", "INFO"]
+counts = {}
+for lvl in levels:
+    counts[lvl] = counts.get(lvl, 0) + 1
+print(counts)   <span class="out"># {'INFO': 3, 'ERROR': 2, 'WARN': 1}</span></code></pre></div>
+          <h5>Notes</h5>
+          <p><code>cpu["missing"]</code> raises <code>KeyError</code>; use <code>cpu.get("missing")</code> (returns <code>None</code>) or <code>cpu.get("missing", 0)</code> for a default. The <code>counts.get(lvl, 0) + 1</code> idiom is the canonical "count without pre-initialising keys" pattern — you'll meet its shortcut, <code>collections.Counter</code>, on Day 15.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab 3 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 3</span><h3>Sets — dedupe services &amp; compare two regions</h3><span class="pill py">Python</span></div>
+      <p class="task">From a noisy list of service names (with duplicates), get the unique set. Then, given the services seen in two regions, find which run in <em>both</em>, and which run in <code>eastus</code> but <em>not</em> <code>centralindia</code>.</p>
+      <div class="code"><div class="codebar"><span class="fname">starter</span><button class="copy">copy</button></div>
+      <pre><code>seen = ["auth", "api", "auth", "cache", "api", "auth"]
+eastus = {"auth", "api", "cache", "search"}
+india  = {"auth", "api", "billing"}
+<span class="cmt"># TODO: unique services; in both regions; in eastus only</span></code></pre></div>
+      <div class="ans">
+        <button class="ans-btn">Show answer ▸</button>
+        <div class="ans-body">
+          <div class="code"><div class="codebar"><span class="fname">solution</span><button class="copy">copy</button></div>
+          <pre><code>seen = ["auth", "api", "auth", "cache", "api", "auth"]
+print(set(seen))               <span class="out"># {'auth', 'api', 'cache'}  (order may vary)</span>
+
+eastus = {"auth", "api", "cache", "search"}
+india  = {"auth", "api", "billing"}
+
+print(eastus &amp; india)          <span class="out"># {'auth', 'api'}      intersection = in both</span>
+print(eastus - india)          <span class="out"># {'cache', 'search'}  difference = eastus only</span>
+print(eastus | india)          <span class="out"># union = everything, deduped</span></code></pre></div>
+          <h5>Notes</h5>
+          <p><code>set(seen)</code> dedupes in one call — the most common real use of sets. The operators read like the algebra: <code>&amp;</code> intersection, <code>-</code> difference, <code>|</code> union, <code>^</code> symmetric difference. Sets are <strong>unordered</strong>, so never rely on their print order.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab 4 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 4</span><h3>Tuples — composite keys &amp; why a list can't be one</h3><span class="pill py">Python</span></div>
+      <p class="task">You want latency keyed by <em>both</em> region and service. Use a <code>(region, service)</code> tuple as the dict key. Then try to use a <code>list</code> as a key and observe what happens — and explain why.</p>
+      <div class="code"><div class="codebar"><span class="fname">starter</span><button class="copy">copy</button></div>
+      <pre><code>latency = {}
+<span class="cmt"># TODO: latency[("eastus","api")] = 120 ; look it up</span>
+<span class="cmt"># TODO: try latency[["eastus","api"]] = 120 and note the error</span></code></pre></div>
+      <div class="ans">
+        <button class="ans-btn">Show answer ▸</button>
+        <div class="ans-body">
+          <div class="code"><div class="codebar"><span class="fname">solution</span><button class="copy">copy</button></div>
+          <pre><code>latency = {}
+latency[("eastus", "api")] = 120
+latency[("india", "api")]  = 95
+
+print(latency[("eastus", "api")])      <span class="out"># 120</span>
+
+<span class="cmt"># a list as a key fails:</span>
+latency[["eastus", "api"]] = 120
+<span class="out"># TypeError: unhashable type: 'list'</span></code></pre></div>
+          <h5>Why</h5>
+          <p>A dict finds a key by hashing it. A <code>tuple</code> is immutable, so its hash is stable and it's a valid key. A <code>list</code> is mutable — its contents (and therefore its hash) could change after insertion, which would strand the entry — so Python forbids it: <code>unhashable type: 'list'</code>. Composite keys like <code>(region, service)</code> are a clean, idiomatic pattern you'll see constantly.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lab 5 -->
+    <div class="lab">
+      <div class="lab-h"><span class="lab-n">LAB 5</span><h3>Mini-project — aggregate metrics from log lines</h3><span class="pill proj">Save to src/</span></div>
+      <p class="task">Given raw log lines <code>"host cpu"</code>, compute the average CPU per host and the set of unique hosts — using all four containers. Save it as <code>src/day03_containers.py</code>, run it, and commit.</p>
+      <div class="code"><div class="codebar"><span class="fname">src/day03_containers.py</span><button class="copy">copy</button></div>
+      <pre><code>lines = [
+    "web-01 42", "web-02 91", "web-01 55",
+    "db-01 66", "web-02 88", "db-01 70",
+]
+
+# TODO:
+#  1. parse each line into a (host, cpu) tuple  -> list of tuples
+#  2. group cpu readings per host               -> dict of host -> list
+#  3. print average cpu per host
+#  4. print the set of unique hosts</code></pre></div>
+      <div class="ans">
+        <button class="ans-btn">Show answer ▸</button>
+        <div class="ans-body">
+          <div class="code"><div class="codebar"><span class="fname">src/day03_containers.py</span><button class="copy">copy</button></div>
+          <pre><code>lines = [
+    "web-01 42", "web-02 91", "web-01 55",
+    "db-01 66", "web-02 88", "db-01 70",
+]
+
+# 1. parse -> list of (host, cpu) tuples
+records = []
+for line in lines:
+    host, cpu = line.split()          <span class="cmt"># split on whitespace -> 2 strings</span>
+    records.append((host, int(cpu)))  <span class="cmt"># tuple: fixed 2-field record</span>
+
+# 2. group cpu readings per host -> dict of host -> list of ints
+by_host = {}
+for host, cpu in records:
+    by_host.setdefault(host, []).append(cpu)
+
+# 3. average per host
+for host, readings in by_host.items():
+    avg = sum(readings) / len(readings)
+    print(f"{host}: avg cpu {avg:.1f} over {len(readings)} samples")
+
+# 4. unique hosts
+print("hosts:", set(by_host))</code></pre></div>
+          <div class="code"><div class="codebar"><span class="fname">run it</span><button class="copy">copy</button></div>
+          <pre><code>python src/day03_containers.py</code></pre></div>
+          <div class="code"><div class="codebar"><span class="fname">expected output</span><button class="copy">copy</button></div>
+          <pre><code>web-01: avg cpu 48.5 over 2 samples
+web-02: avg cpu 89.5 over 2 samples
+db-01: avg cpu 68.0 over 2 samples
+hosts: {'web-01', 'web-02', 'db-01'}</code></pre></div>
+          <h5>Why this is the whole day in one script</h5>
+          <p><strong>list</strong> holds the ordered records; each record is a <strong>tuple</strong> (fixed shape, safe to unpack); <strong>dict</strong> groups readings by host with the <code>setdefault(host, []).append(...)</code> idiom; <strong>set</strong> gives unique hosts for free via <code>set(by_host)</code> (iterating a dict yields its keys). This "parse → group → aggregate" shape is exactly what you'll do to a real dataset before any modeling.</p>
+          <div class="code"><div class="codebar"><span class="fname">commit</span><button class="copy">copy</button></div>
+          <pre><code>git add src/day03_containers.py
+git commit -m "day 03: containers mini-project"
+git push</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REFERENCE -->
+  <section class="panel" id="ref">
+    <h2>Which container when</h2>
+    <table>
+      <thead><tr><th>You need…</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td>An ordered, growable sequence</td><td><code>list</code></td></tr>
+        <tr><td>A fixed record that won't change / a dict key</td><td><code>tuple</code></td></tr>
+        <tr><td>Key → value lookups, counting, caching</td><td><code>dict</code></td></tr>
+        <tr><td>Uniqueness, dedupe, fast "is it in here?"</td><td><code>set</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2>Complexity cheat sheet (average case)</h2>
+    <table>
+      <thead><tr><th>Operation</th><th>list</th><th>dict</th><th>set</th></tr></thead>
+      <tbody>
+        <tr><td><code>x in c</code> (membership)</td><td>O(n)</td><td>O(1)</td><td>O(1)</td></tr>
+        <tr><td>index / key access</td><td>O(1)</td><td>O(1)</td><td>—</td></tr>
+        <tr><td>append / add</td><td>O(1)</td><td>O(1)</td><td>O(1)</td></tr>
+        <tr><td>remove by value</td><td>O(n)</td><td>O(1)</td><td>O(1)</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Common list methods</h2>
+    <table>
+      <tbody>
+        <tr><td><code>.append(x)</code></td><td>add one item to the end</td></tr>
+        <tr><td><code>.extend(xs)</code></td><td>add all items from an iterable</td></tr>
+        <tr><td><code>.sort()</code> / <code>sorted(l)</code></td><td>in place (returns None) / new sorted list</td></tr>
+        <tr><td><code>.pop(i)</code></td><td>remove &amp; return item at index i (default last)</td></tr>
+        <tr><td><code>l[a:b]</code></td><td>slice — a new list from index a up to (not incl.) b</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Common dict methods</h2>
+    <table>
+      <tbody>
+        <tr><td><code>.get(k, default)</code></td><td>value for k, or default instead of KeyError</td></tr>
+        <tr><td><code>.setdefault(k, [])</code></td><td>get k, inserting a default if absent (great for grouping)</td></tr>
+        <tr><td><code>.items()</code> / <code>.keys()</code> / <code>.values()</code></td><td>iterate pairs / keys / values</td></tr>
+        <tr><td><code>k in d</code></td><td>membership tests the <em>keys</em></td></tr>
+      </tbody>
+    </table>
+
+    <h2>Set operations</h2>
+    <table>
+      <tbody>
+        <tr><td><code>a &amp; b</code></td><td>intersection — in both</td></tr>
+        <tr><td><code>a | b</code></td><td>union — in either (deduped)</td></tr>
+        <tr><td><code>a - b</code></td><td>difference — in a, not b</td></tr>
+        <tr><td><code>a ^ b</code></td><td>symmetric difference — in exactly one</td></tr>
+      </tbody>
+    </table>
+
+    <div class="call">
+      <span class="k">Hashable = can be a key/element</span>
+      Immutable types (<code>str, int, float, bool, tuple, frozenset</code>) are hashable. Mutable ones (<code>list, dict, set</code>) are not, so they can't be dict keys or set members.
+    </div>
+  </section>
+
+  <!-- Q&A -->
+  <section class="panel" id="qa">
+    <p class="lead">Scenario and interview-style questions. Think through your answer before expanding.</p>
+
+    <details class="qa"><summary>You're filtering millions of records against a "known bad hosts" collection. Does it matter if that collection is a list or a set?<span class="qtag">performance</span></summary>
+      <div class="a"><strong>Enormously.</strong> Each membership test <code>host in known_bad</code> is O(n) on a <code>list</code> (Python scans it) and O(1) on a <code>set</code> (one hash lookup). Filtering <em>m</em> records against <em>n</em> bad hosts is O(m·n) with a list and O(m) with a set. At millions of records that's the difference between seconds and effectively hung. Rule of thumb: if you built a collection <em>just to test membership against it</em>, make it a set.</div>
+    </details>
+
+    <details class="qa"><summary>Why can a tuple be a dictionary key but a list can't?<span class="qtag">concept</span></summary>
+      <div class="a">Dict keys must be <strong>hashable</strong>, and hashability requires the value to be immutable. A dict stores a key by a hash computed from its contents; if the contents could change after insertion, the stored hash would no longer match and the entry would be unreachable. A <code>tuple</code> is immutable, so its hash is stable — valid key. A <code>list</code> is mutable, so Python refuses it with <code>TypeError: unhashable type: 'list'</code>. This is why composite keys are written as tuples, e.g. <code>metrics[(region, service)]</code>.</div>
+    </details>
+
+    <details class="qa"><summary>A function needs to return a fixed set of values — say precision and recall. List or tuple?<span class="qtag">design</span></summary>
+      <div class="a"><strong>Tuple.</strong> The result has a fixed shape and fixed meaning (position 0 is precision, position 1 is recall), and it shouldn't be mutated by the caller — that's exactly what a tuple signals. It also unpacks cleanly: <code>precision, recall = evaluate(model)</code>. Reach for a list when the number of elements is variable and the caller may grow or shrink it; reach for a tuple for a fixed, heterogeneous record. (Later you'll meet <code>NamedTuple</code>/<code>dataclass</code> for when you want named fields too.)</div>
+    </details>
+
+    <details class="qa"><summary>How would you deduplicate a list while preserving the original order?<span class="qtag">practical</span></summary>
+      <div class="a">A plain <code>set(items)</code> dedupes but loses order. To keep first-seen order, use <code>list(dict.fromkeys(items))</code> — dicts preserve insertion order and enforce unique keys, so it does both in one expression. The explicit form is a loop with a <code>seen</code> set: add to the result only when <code>x not in seen</code>, then <code>seen.add(x)</code>. Both are O(n); the <code>dict.fromkeys</code> one-liner is the idiomatic choice.</div>
+    </details>
+
+    <details class="qa"><summary>What's the danger in writing <code>def collect(x, acc=[])</code> as a function signature?<span class="qtag">gotcha</span></summary>
+      <div class="a">The classic <strong>mutable default argument</strong> bug. The default <code>[]</code> is created <em>once</em>, when the function is defined, and <em>shared across every call</em> that doesn't pass <code>acc</code>. So <code>acc</code> accumulates across calls and results bleed together. The fix is the standard idiom: default to <code>None</code> and create the list inside — <code>def collect(x, acc=None): acc = [] if acc is None else acc</code>. The same trap applies to <code>{}</code> and <code>set()</code> defaults. It's a favourite interview question precisely because it catches people who don't know when default values are evaluated.</div>
+    </details>
+
+    <details class="qa"><summary>You need to count occurrences of each item in a large stream. What's the clean way?<span class="qtag">practical</span></summary>
+      <div class="a">A <code>dict</code> with the <code>counts[x] = counts.get(x, 0) + 1</code> idiom works and shows you understand the mechanics. In real code you'd reach for <code>collections.Counter(stream)</code>, which does exactly this and adds helpers like <code>.most_common(5)</code>. Both are O(n) and O(k) space for k distinct items. Mentioning you'd start with the dict idiom and know <code>Counter</code> as the batteries-included version is a good "I know the fundamentals and the tools" answer.</div>
+    </details>
+  </section>
+
+  <!-- PROGRESS -->
+  <section class="panel" id="prog">
+    <h2>Day 3 checklist</h2>
+    <div class="pbar"><i id="pfill"></i></div>
+    <div id="checks">
+      <label class="chk"><input type="checkbox" data-c="1"><span>Lab 1 — lists: count / total / max / sort / append</span></label>
+      <label class="chk"><input type="checkbox" data-c="2"><span>Lab 2 — dicts: lookup, update, iterate, count log levels</span></label>
+      <label class="chk"><input type="checkbox" data-c="3"><span>Lab 3 — sets: dedupe + intersection/difference/union</span></label>
+      <label class="chk"><input type="checkbox" data-c="4"><span>Lab 4 — tuples as composite keys; saw the list-key TypeError</span></label>
+      <label class="chk"><input type="checkbox" data-c="5"><span>Lab 5 — saved &amp; ran <code>src/day03_containers.py</code>, committed &amp; pushed</span></label>
+      <label class="chk"><input type="checkbox" data-c="6"><span>Read all six Q&amp;A answers</span></label>
+    </div>
+
+    <div class="say">
+      <strong>What you can now say / do:</strong>
+      <ul>
+        <li>"I choose containers by cost: set/dict for O(1) membership and lookups, list for ordered sequences, tuple for fixed records and composite keys."</li>
+        <li>"I know why a list can't be a dict key (hashability) and can write the mutable-default-argument fix from memory."</li>
+        <li>You have a runnable parse → group → aggregate script — the exact shape of real data prep.</li>
+      </ul>
+    </div>
+
+    <a class="nextbtn" href="#" onclick="return false;">Next → Day 04: Comprehensions &amp; Pythonic idioms</a>
+  </section>
+
+
+  <nav class="daynav">
+    <a class="nav-prev" href="day-02-ml-lifecycle-and-portfolio.html"><span class="nav-dir">◂ Prev</span><span class="nav-lbl">Day 02 · ML Lifecycle</span></a>
+    <a class="nav-hub" href="../roadmap/ai-ml-engineer-182-day-roadmap.html" title="All days (roadmap)">▦<br>All days</a>
+    <span class="nav-none nav-next"><span class="nav-dir">Next ▸</span><span class="nav-lbl">Day 04 · coming soon</span></span>
+  </nav>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    panels.forEach(p => p.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.tab).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }));
+
+  document.querySelectorAll('.ans-btn').forEach(b => b.addEventListener('click', () => {
+    const body = b.nextElementSibling;
+    const open = body.classList.toggle('open');
+    b.textContent = open ? 'Hide answer ▾' : 'Show answer ▸';
+  }));
+
+  // Copy buttons (works over file:// too, with fallback)
+  function fallbackCopy(text, ok, no){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed'; ta.style.top = '-9999px';
+    document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, text.length);
+    let done = false;
+    try { done = document.execCommand('copy'); } catch(e){ done = false; }
+    document.body.removeChild(ta);
+    done ? ok() : no();
+  }
+  document.querySelectorAll('.copy').forEach(btn => btn.addEventListener('click', () => {
+    const code = btn.closest('.code').querySelector('code');
+    const text = code.innerText;
+    const ok = () => { btn.textContent = 'copied ✓'; setTimeout(() => btn.textContent = 'copy', 1200); };
+    const no = () => { btn.textContent = 'Ctrl/⌘+C'; setTimeout(() => btn.textContent = 'copy', 1600); };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok, no));
+    } else {
+      fallbackCopy(text, ok, no);
+    }
+  }));
+
+  const KEY = 'day03_datastructures_progress';
+  let state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ state = {}; }
+  const boxes = document.querySelectorAll('#checks input');
+  function refresh(){
+    const done = Object.values(state).filter(Boolean).length;
+    document.getElementById('pfill').style.width = (done/boxes.length*100) + '%';
+  }
+  boxes.forEach(cb => {
+    const id = cb.dataset.c;
+    cb.checked = !!state[id];
+    cb.closest('.chk').classList.toggle('done', cb.checked);
+    cb.addEventListener('change', () => {
+      state[id] = cb.checked;
+      localStorage.setItem(KEY, JSON.stringify(state));
+      cb.closest('.chk').classList.toggle('done', cb.checked);
+      refresh();
+    });
+  });
+  refresh();
+</script>
+</body>
+</html>

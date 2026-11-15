@@ -19,7 +19,7 @@
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--body);font-size:15px;line-height:1.6;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-  .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 90px}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 56px}
   code,pre,.mono{font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace}
   p code,td code,li code,.a code,summary code{background:var(--code-bg);border:1px solid var(--line);
     padding:1px 5px;border-radius:5px;font-size:.88em;color:#0b3b37}
@@ -141,6 +141,27 @@
     .code,.lab,.qa,table,.call{page-break-inside:avoid}
     a{color:#000;text-decoration:none}
   }
+
+
+  /* top strip: hub link only, right-aligned */
+  .navstrip{display:flex;justify-content:flex-end;margin:16px 0 0;}
+  .navstrip a{font-family:"SF Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--teal);
+    border:1px solid var(--line);border-radius:8px;padding:6px 11px;text-decoration:none;}
+  .navstrip a:hover{border-color:var(--teal);background:var(--teal-soft);}
+  /* bottom day-navigation bar */
+  .daynav{display:flex;align-items:stretch;gap:12px;margin:40px 0 0;padding-top:24px;border-top:1px solid var(--line);}
+  .daynav a,.daynav span.nav-none{flex:1 1 0;display:flex;flex-direction:column;gap:3px;
+    border:1px solid var(--line);border-radius:10px;padding:12px 16px;text-decoration:none;background:var(--bg);min-width:0;}
+  .daynav a:hover{border-color:var(--teal);background:var(--teal-soft);}
+  .daynav .nav-dir{font-family:"SF Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);}
+  .daynav .nav-lbl{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .daynav a.nav-next,.daynav span.nav-none.nav-next{align-items:flex-end;text-align:right;}
+  .daynav a.nav-roadmap .nav-lbl{color:var(--teal);}
+  .daynav .nav-hub{flex:none;justify-content:center;align-items:center;text-align:center;line-height:1.3;
+    font-family:"SF Mono",monospace;font-size:11px;color:var(--teal);}
+  .daynav span.nav-none{opacity:.4;cursor:default;}
+  @media(max-width:560px){.daynav{flex-wrap:wrap}.daynav .nav-hub{order:3;flex:1 1 100%}}
+  @media print{.navstrip,.daynav{display:none!important}}
 </style>
 </head>
 <body>
@@ -157,8 +178,9 @@
       <span><b>Theme</b> print-friendly</span>
     </div>
   </header>
+  <div class="navstrip"><a href="../roadmap/ai-ml-engineer-182-day-roadmap.html" title="All days (roadmap)">▦ All days</a></div>
 
-  <nav class="tabs">
+<nav class="tabs">
     <button class="tab active" data-tab="learn">Learn</button>
     <button class="tab" data-tab="labs">Labs</button>
     <button class="tab" data-tab="ref">Reference</button>
@@ -193,7 +215,7 @@
     <h2>Why a real repo, and real remote state</h2>
     <p>Two habits separate a "did a course" candidate from a "ships to production" one, and you'll bake both in today:</p>
     <p><strong>1 · A structured repo.</strong> Exploration (notebooks) is kept separate from reusable code (<code>src/</code>) and from infrastructure (<code>infra/</code>). Each of your ten portfolio projects gets its own folder. This is what a reviewer opens, and it signals engineering maturity instantly.</p>
-    <p><strong>2 · Remote Terraform state.</strong> Day 1 kept state in a local file — fine for one person, one machine. Real teams put state in a shared, locked, encrypted backend so changes are collaborative, durable, and never sitting in Git. Moving it there is exactly the "controlled configuration management" the JD asks for, and it's a satisfying, concrete lab.</p>
+    <p><strong>2 · Remote Terraform state (optional while you're solo).</strong> Terraform always stores state — right now in a local <code>terraform.tfstate</code> file, which is completely fine for one person on one machine. A <em>remote</em> backend is an upgrade for teams: state moves to shared, locked, encrypted storage. You don't need it to progress, but doing it <em>once</em> gives you a real answer to the near-certain interview question "how do you manage Terraform state safely on a team?" — the JD's "controlled configuration management."</p>
 
     <div class="call amber">
       <span class="k">Today's mission</span>
@@ -217,7 +239,8 @@ git checkout -b day-02-setup
 <span class="cmt"># add only the working folders you'll grow into (don't recreate or overwrite what exists):</span>
 mkdir -p notebooks src projects docs
 mkdir -p projects/01-eda-report projects/02-classifier
-touch notebooks/.gitkeep src/.gitkeep docs/.gitkeep   <span class="cmt"># track empty dirs</span>
+touch notebooks/.gitkeep src/.gitkeep docs/.gitkeep \
+      projects/.gitkeep projects/01-eda-report/.gitkeep projects/02-classifier/.gitkeep   <span class="cmt"># track empty dirs (git ignores empty folders)</span>
 
 git add .
 git commit -m "chore: add working folders (notebooks, src, projects, docs)"</code></pre></div>
@@ -246,8 +269,8 @@ tree -L 2 -d        <span class="cmt"># the folder skeleton (or: ls -R)</span></
 
     <!-- Lab 2 -->
     <div class="lab">
-      <div class="lab-h"><span class="lab-n">LAB 2</span><h3>Stand up a remote state backend</h3><span class="pill tf">Terraform</span></div>
-      <p class="task">Terraform needs somewhere to store state <em>before</em> Terraform manages it — a classic bootstrap. Create a dedicated Storage Account + blob container with the Azure CLI (kept separate from your app infra), so it survives even a full <code>destroy</code>.</p>
+      <div class="lab-h"><span class="lab-n">LAB 2</span><h3>Stand up a remote state backend (optional)</h3><span class="pill tf">Terraform</span></div>
+      <p class="task"><strong>Optional — skip if you're staying on local state.</strong> Terraform already stores state (the local <code>terraform.tfstate</code> from Day 1). This lab is the upgrade to <em>remote</em> state. The one wrinkle: a remote backend's blob container must exist <em>before</em> Terraform can use it — a classic bootstrap — so you create it with the Azure CLI, kept separate from your app infra so it survives a full <code>destroy</code>. Solo learners can skip this and revisit it in the MLOps phase (P6); the rest of the track works fine on local state.</p>
       <div class="code"><div class="codebar"><span class="fname">backend-bootstrap.sh</span><button class="copy">copy</button></div>
       <pre><code>RG=tfstate-rg
 LOC=centralindia
@@ -276,7 +299,7 @@ az storage container list --account-name $SA -o table   <span class="cmt"># tfst
 
     <!-- Lab 3 -->
     <div class="lab">
-      <div class="lab-h"><span class="lab-n">LAB 3</span><h3>Migrate Terraform state to the backend</h3><span class="pill tf">Terraform</span></div>
+      <div class="lab-h"><span class="lab-n">LAB 3</span><h3>Migrate Terraform state to the backend (optional)</h3><span class="pill tf">Terraform</span></div>
       <p class="task">Point your Day-1 <code>infra/foundation/</code> config at the remote backend and migrate the existing local state into it. Add the backend block, then re-init.</p>
       <div class="code"><div class="codebar"><span class="fname">infra/foundation/backend.tf</span><button class="copy">copy</button></div>
       <pre><code>terraform {
@@ -467,6 +490,12 @@ No changes. Your infrastructure matches the configuration.</code></pre></div>
     <a class="nextbtn" href="#" onclick="return false;">Next → Day 03: Python refresh — data structures, comprehensions, and SRE-flavored idioms</a>
   </section>
 
+
+  <nav class="daynav">
+    <a class="nav-prev" href="day-01-alignment-and-foundation.html"><span class="nav-dir">◂ Prev</span><span class="nav-lbl">Day 01 · Alignment</span></a>
+    <a class="nav-hub" href="../roadmap/ai-ml-engineer-182-day-roadmap.html" title="All days (roadmap)">▦<br>All days</a>
+    <a class="nav-next" href="day-03-python-data-structures.html"><span class="nav-dir">Next ▸</span><span class="nav-lbl">Day 03 · Data Structures</span></a>
+  </nav>
 </div>
 
 <script>
